@@ -1,0 +1,16 @@
+2023/01/26 09:38:43 [error] 1218#1218: *44 FastCGI sent in stderr: "PHP message: PHP Fatal error:  Uncaught ReflectionException: Class "config" does not exist in /var/www/html/testlaravel/vendor/laravel/framework/src/Illuminate/Container/Container.php:893
+Stack trace:
+#0 /var/www/html/testlaravel/vendor/laravel/framework/src/Illuminate/Container/Container.php(893): ReflectionClass->__construct()
+#1 /var/www/html/testlaravel/vendor/laravel/framework/src/Illuminate/Container/Container.php(774): Illuminate\Container\Container->build()
+#2 /var/www/html/testlaravel/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve()
+#3 /var/www/html/testlaravel/vendor/laravel/framework/src/Illuminate/Container/Container.php(710): Illuminate\Foundation\Application->resolve()
+#4 /var/www/html/testlaravel/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make()
+#5 /var/www/html/testlaravel/vendor/laravel/framework/src/Illuminate/Container/Container.php(1437): Illuminate\Fo" while reading response header from upstream, client: 127.0.0.1, server: testlaravel.local, request: "GET /home HTTP/1.1", upstream: "fastcgi://unix:/var/run/php/php8.2-fpm.sock:", host: "testlaravel.local", referrer: "http://testlaravel.local/home"
+2023/01/26 09:38:56 [error] 1218#1218: *44 FastCGI sent in stderr: "PHP message: PHP Fatal error:  Uncaught ReflectionException: Class "config" does not exist in /var/www/html/testlaravel/vendor/laravel/framework/src/Illuminate/Container/Container.php:893
+Stack trace:
+#0 /var/www/html/testlaravel/vendor/laravel/framework/src/Illuminate/Container/Container.php(893): ReflectionClass->__construct()
+#1 /var/www/html/testlaravel/vendor/laravel/framework/src/Illuminate/Container/Container.php(774): Illuminate\Container\Container->build()
+#2 /var/www/html/testlaravel/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(860): Illuminate\Container\Container->resolve()
+#3 /var/www/html/testlaravel/vendor/laravel/framework/src/Illuminate/Container/Container.php(710): Illuminate\Foundation\Application->resolve()
+#4 /var/www/html/testlaravel/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(845): Illuminate\Container\Container->make()
+#5 /var/www/html/testlaravel/vendor/laravel/framework/src/Illuminate/Container/Container.php(1437): Illuminate\Fo" while reading response header from upstream, client: 127.0.0.1, server: testlaravel.local, request: "GET /home HTTP/1.1", upstream: "fastcgi://unix:/var/run/php/php8.2-fpm.sock:", host: "testlaravel.local", referrer: "http://testlaravel.local/home"
