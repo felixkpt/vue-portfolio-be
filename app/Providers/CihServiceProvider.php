@@ -2,7 +2,11 @@
 
 namespace App\Providers;
 
-use App\Cih\App\Http\Middleware\ShAuth;
+use App\Cih\Commands\Autogenerate\AutoGenerateList;
+use App\Cih\Commands\BackupDatabase;
+use App\Cih\Commands\CachePermissions;
+use App\Cih\Commands\CreateSuperAdmin;
+use App\Cih\Http\Middleware\ShAuth;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
@@ -16,7 +20,7 @@ class CihServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        require base_path('app/Repository/helperrepo.php');
     }
 
     /**
@@ -31,10 +35,19 @@ class CihServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
-        $router = $this->app->make(Router::class);
-        $router->aliasMiddleware('sh_auth', ShAuth::class);   
-        $this->loadRoutesFrom(base_path('app/Cih/routes/driver.php'));
-        $this->loadMigrationsFrom(base_path('app/Cih/migrations'));
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                ...AutoGenerateList::commands(),
+                BackupDatabase::class,
+                // Initialize::class,
+                CreateSuperAdmin::class,
+                CachePermissions::class
+            ]);
+        }
 
+        $router = $this->app->make(Router::class);
+        $router->aliasMiddleware('sh_auth', ShAuth::class);
+        $this->loadRoutesFrom(base_path('app/Cih/routes/driver.php'));
+        $this->loadMigrationsFrom(base_path('app/Cih/App/Migrations'));
     }
 }

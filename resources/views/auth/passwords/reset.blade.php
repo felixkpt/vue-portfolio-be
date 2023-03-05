@@ -57,6 +57,32 @@
                             </div>
                         </div>
                     </form>
+
+
+                    <div class="password-hint-wrapper d-none">
+                        <br>
+                        <h6>Password requirements</h6>
+                        <div class="hint is-long-enough hint-valid">
+                          <svg class="malibu-icon malibu-icon-dark-gray">
+                            <use xlink:href="#confirm-16"></use>
+                          </svg>
+                          Must be a minimum of 8 characters.
+                        </div>
+              
+                        <div class="hint has-all-characters hint-valid">
+                          <svg class="malibu-icon malibu-icon-dark-gray">
+                            <use xlink:href="#confirm-16"></use>
+                          </svg>
+                          Must contain letters, numbers, and symbols.
+                        </div>
+              
+                        <div class="hint passwords-match hint-valid">
+                          <svg class="malibu-icon malibu-icon-dark-gray">
+                            <use xlink:href="#confirm-16"></use>
+                          </svg>
+                          Passwords must match.
+                        </div>
+                      </div>
                 </div>
             </div>
         </div>

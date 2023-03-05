@@ -1,0 +1,11 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use {full_controller_path};
+
+Route::get('/', [{controller}::class, 'index']);
+Route::post('/', [{controller}::class, 'store{umodel}']);
+Route::get('/list-options', [{controller}::class, 'listSelectOptions']);
+Route::get('/list', [{controller}::class, 'list{umodels}']);
+Route::post('/toggle-status/{id}', [{controller}::class, 'toggle{umodel}Status']);
+Route::delete('/delete/{id}', [{controller}::class, 'destroy{umodel}']);

@@ -1,0 +1,28 @@
+@extends('layouts.app')
+
+@section('title') {umodels} @endsection
+
+@section('content')
+<div class="row">
+    <div class="col-md-12">
+        <h5 class="page-title">{cmodel}</h5>
+        <div class="card">
+            <div class="card-body">
+                <a href="#{model}_modal" class="btn btn-info btn-sm clear-form float-right" data-toggle="modal"><i class="fa fa-plus"></i> ADD {cmodel}</a>
+                @include('common.bootstrap_table_ajax',[
+                'table_headers' => [{model_fields}],
+                'data_url' => '{route_url}/list',
+                'base_tbl' => '{models}'
+                ])
+
+                @include('common.auto_modal',[
+                    'modal_id' => '{model}_modal',
+                    'modal_title' => '{cmodel} FORM',
+                    'modal_content' => autoForm(\{full_model_path}::class, "{route_url}")
+                ])
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+

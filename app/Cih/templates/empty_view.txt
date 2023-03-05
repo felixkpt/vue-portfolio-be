@@ -1,0 +1,15 @@
+@extends('layouts.app')
+
+@section('title') {title} @endsection
+
+@section('content')
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                {page_content_go_here}
+            </div>
+        </div>
+    </div>
+</div>
+@endsection

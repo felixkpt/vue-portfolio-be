@@ -1,0 +1,10 @@
+{
+    "main": "/admin",
+    "roles": [
+        "admin"
+    ],
+    "urls": [
+        "/auth/notifications"
+    ],
+    "children": {}
+}
