@@ -55,11 +55,18 @@ class Route extends Command
 
         if (file_exists($path)) return $this->error("Whoops! It seems like a similar route already exists.");
 
-        $content = file_get_contents(base_path("app/Cih/templates/route.txt"));
+        // single or plural view content
+        if ($this->autoGenerateProps->is_singular === true)
+            $content = file_get_contents(base_path("app/Cih/templates/route_singular.txt"));
+        else
+            $content = file_get_contents(base_path("app/Cih/templates/route.txt"));
 
         $new_content = $this->replaceVars($content, true);
         $this->storeFile($path, $new_content);
-        
+
+        $this->autoGenerateProps->set('route_folder', $this->autoGenerateProps->route_folder_init);
+        $this->autoGenerateProps->set('view_folder', $this->autoGenerateProps->view_folder_init);
+
         $this->autoGenerateProps->save($this->autoGenerateProps);
     }
 }

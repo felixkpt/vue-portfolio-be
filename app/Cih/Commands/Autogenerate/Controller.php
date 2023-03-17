@@ -55,6 +55,9 @@ class Controller extends Command
         $proceed = $this->promptControllerName();
         if ($proceed === false) return false;
 
+        $proceed = $this->promptControllerFolder();
+        if ($proceed === false) return false;
+
         $confirmed = false;
         while ($confirmed === false) {
             $confirmed = $this->confirm("The Controller path will be: app/Http/Controllers/" . $this->namespaceToPath(true) . '/' . $this->autoGenerateProps->controller_name . '.php' . "\nIs everything alright?");
@@ -119,10 +122,20 @@ class Controller extends Command
         return trim(preg_replace("#(\\\\+)|(/+)" . ($full_path === true ? '' : '|(Http\\\\Controllers)') . "#", "/", $this->autoGenerateProps->namespace), '/');
     }
 
-
     public function setControllerAndRouteFolderNames()
     {
-        $subfolder = strtolower($this->ask("Controller subfolder? (eg Web, Api or Admin, routes folder will use lowercased form), A to abort", $this->autoGenerateProps->controller_subfolder));
+
+        $guessed_folder = $this->plainControllerName();
+        // Singular was typed
+        if ($this->plainControllerName() !== Str::plural($this->plainControllerName())) {
+            $guessed_folder = Str::plural($this->plainControllerName()) . '/' . $this->plainControllerName();
+        }
+        $guessed_folder = $this->autoGenerateProps->controller_subfolder  . '/' . $guessed_folder;
+
+        $this->autoGenerateProps->set('route_folder', strtolower($guessed_folder));
+        $this->autoGenerateProps->set('view_folder', strtolower($guessed_folder));
+
+        $subfolder = strtolower($this->ask("Controller subfolder? (eg Web, Api or Admin, / to start from current), A to abort", $guessed_folder));
         if (strtolower($subfolder) == 'a') return false;
 
         // lets append subfolder to current subfolder if it starts with / and not followed by current subfolder
@@ -130,12 +143,14 @@ class Controller extends Command
             $subfolder = $this->autoGenerateProps->controller_subfolder . $subfolder;
         }
 
+
         if (strlen($subfolder) > 1) {
             $parts = explode('/', $subfolder);
             $subfolder = array_reduce($parts, fn ($prev, $curr) => $prev . '/' . Str::studly($curr), '');
         } else $subfolder = ucfirst(strtolower(preg_replace("#Controller$#", "", $this->autoGenerateProps->controller_name)));
 
-        $this->autoGenerateProps->set('controller_subfolder', ltrim($subfolder, '/'));
+        $subfolder = ltrim($subfolder, '/');
+        $this->autoGenerateProps->set('controller_subfolder', $subfolder);
 
         // lets guess default name now if we dont have any yet and subfolder matches at least on (slash) /
         if (!$this->autoGenerateProps->default_name) {
@@ -151,39 +166,47 @@ class Controller extends Command
             if (!$this->confirm("You recently created a model (" . $this->autoGenerateProps->model_name . "), use the model info?", 'Yes')) $this->promptModel();
         }
 
-        // Setting controller's & routes folder
-        $proceed = $this->setControllerAndRouteFolderNames();
-        if ($proceed === false) return false;
-
-        // set guessed namespace
-        $this->setNamespace();
-
+        $this->autoGenerateProps->set('controller_subfolder', $this->autoGenerateProps->controller_subfolder_init);
 
         $controller_name = "";
         while (!preg_match('#[a-z0-9]#i', $controller_name)) {
 
             // lets prevent pluralizing default_name if it looks like single of another one
             $name = null;
-
-            if (preg_match("#" . Str::plural($this->autoGenerateProps->default_name) . '/' . Str::singular($this->autoGenerateProps->default_name) . "#i", $this->autoGenerateProps->controller_subfolder)) {
-                $name = Str::singular($this->autoGenerateProps->default_name) . 'Controller';
-            } else if ($this->autoGenerateProps->default_name) {
-                $name = Str::studly($this->autoGenerateProps->default_name);
-                $dontPluralize = ['admin'];
-                $name = (in_array(strtolower($name), $dontPluralize) ? $name : Str::plural($name)) . 'Controller';
-            }
+            if ($this->autoGenerateProps->default_name)
+                if (preg_match("#" . Str::plural($this->autoGenerateProps->default_name) . '/' . Str::singular($this->autoGenerateProps->default_name) . "#i", $this->autoGenerateProps->controller_subfolder)) {
+                    $name = Str::singular($this->autoGenerateProps->default_name) . 'Controller';
+                } else if ($this->autoGenerateProps->default_name) {
+                    $name = Str::studly($this->autoGenerateProps->default_name);
+                    $dontPluralize = ['admin'];
+                    $name = (in_array(strtolower($name), $dontPluralize) ? $name : Str::plural($name)) . 'Controller';
+                }
 
             $controller_name = $this->ask("What is the controller name?, A to abort", $name);
             if (strtolower($controller_name) == 'a') return false;
             $controller_name = Str::studly($controller_name);
         }
-        $controller_name = preg_match("#Controller$#", $controller_name) ? $controller_name : $controller_name . 'Controller';
-        $this->autoGenerateProps->set('controller_name', $controller_name);
+
+
+        // Updating default name
+        $this->autoGenerateProps->set('default_name', $controller_name);
 
         // Let guess the model name
-        if (!$this->autoGenerateProps->model_name) {
-            $model_name = Str::singular(preg_replace("#Controller$#", "", $controller_name));
-            $this->setModel($model_name);
-        }
+        if (!$this->autoGenerateProps->model_name)
+            $this->setModel($controller_name);
+
+
+        $controller_name = preg_match("#Controller$#", $controller_name) ? $controller_name : $controller_name . 'Controller';
+        $this->autoGenerateProps->set('controller_name', $controller_name);
+    }
+
+    public function promptControllerFolder()
+    {
+        // Setting controller's & routes folder
+        $proceed = $this->setControllerAndRouteFolderNames();
+        if ($proceed === false) return false;
+
+        // set guessed namespace
+        $this->setNamespace();
     }
 }

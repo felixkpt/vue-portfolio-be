@@ -49,13 +49,16 @@ trait CommonTrait
         if ($umodel)
             $umodels = Str::plural($umodel);
 
-        // dd($this->autoGenerateProps->fully_qualified_class);
-        // .'\\'.$this->autoGenerateProps->default_name
+        $route_index = $this->autoGenerateProps->route_index === 'index' ? 'index' : strtolower($this->autoGenerateProps->default_name);
+        $view_index = $this->autoGenerateProps->view_index === 'index' ? 'index' : strtolower($this->autoGenerateProps->default_name);
+
         $new_content = str_replace('{model}', $model, $content);
         $new_content = str_replace('{cmodel}', strtoupper($model), $new_content);
-        $new_content = str_replace('{title}', $this->autoGenerateProps->title, $new_content);
+        $new_content = str_replace('{title}', $this->autoGenerateProps->view_title, $new_content);
         $new_content = str_replace('{models}', $models, $new_content);
         $new_content = str_replace('{umodel}', $umodel, $new_content);
+        $new_content = str_replace('{route_name}', $route_index, $new_content);
+        $new_content = str_replace('{view_name}', $view_index, $new_content);
         $new_content = str_replace('{umodels}', $umodels, $new_content);
         $new_content = str_replace('{smumodel}', strtolower($umodel), $new_content);
         $new_content = str_replace('{route_folder}', $this->autoGenerateProps->route_folder, $new_content);
@@ -69,13 +72,15 @@ trait CommonTrait
 
     function setModel($model_name)
     {
-        $model_name = Str::singular($model_name);
-
         $this->autoGenerateProps->set('default_name', $model_name);
+
+        $model_name = Str::singular(Str::studly($model_name));
+
         $this->autoGenerateProps->set('model_name', $model_name);
 
         $model_namespace = trim($this->autoGenerateProps->model_folder . "/" . $model_name, '/');
         $this->autoGenerateProps->set('model_namespace', 'App\\Models\\' . $model_namespace);
+
     }
 
     public function rollbackProps()
@@ -87,5 +92,10 @@ trait CommonTrait
     public function alertUser($message)
     {
         return $this->alert('####### ' . $message . ' #######');
+    }
+
+    public function plainControllerName()
+    {
+        return preg_replace("#Controller$#", "", $this->autoGenerateProps->controller_name);
     }
 }

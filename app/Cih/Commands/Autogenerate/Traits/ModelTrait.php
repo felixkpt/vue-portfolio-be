@@ -88,12 +88,23 @@ trait ModelTrait
 
         while ($add_more) {
 
+            $field_name = '';
             $invalid = true;
-            $msg = '';
             while ($invalid) {
-                $field_name = $this->ask("Add new field, N to end" . $msg);
-                $invalid = in_array($field_name, $columntypes);
-                $msg = " (" . $field_name . " looks invalid)";
+
+                $field_name = $this->ask("Add new field, N to end");
+
+                if (strlen($field_name) > 0) {
+
+                    $invalid = in_array($field_name, $columntypes);
+
+                    if ($invalid === true) {
+                        $accepted = $this->confirm("Whoops! " . $field_name . " looks invalid, use it anyway?");
+
+                        if ($accepted === true) $invalid = false;
+                        else $field_name = '';
+                    }
+                }
             }
 
             if (strtolower($field_name) == 'n') {
@@ -121,6 +132,8 @@ trait ModelTrait
                         'created_by' => 'unsignedBigInteger',
                         'id' => 'unsignedBigInteger',
                         '*_id' => 'unsignedBigInteger',
+                        '*phone*' => 'unsignedBigInteger',
+                        'is_*' => 'boolean',
                         'status' => 'boolean',
                         'content' => 'longText',
                         'date' => 'date', 'date_time' => 'dateTime', 'time' => 'time'
@@ -128,6 +141,16 @@ trait ModelTrait
 
                     $try = preg_match("#_id$#", $field_name) ? '*_id' : $field_name;
                     $default = $guessed[$try] ?? 'string';
+
+                    if (preg_match("#_id$#", $field_name))
+                        $default = $guessed['*_id'];
+
+                    if (preg_match("#^is_#", $field_name))
+                        $default = $guessed['is_*'];
+
+                    if (preg_match("#^phone|phone$#", $field_name))
+                        $default = $guessed['*phone*'];
+
 
                     $stop = false;
                     $msg = '';

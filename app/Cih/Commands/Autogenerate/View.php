@@ -59,14 +59,22 @@ class View extends Command
         if (strtolower($this->ask("Create view with content from model? Y or N", 'Yes')) == 'y') {
             if (!$this->autoGenerateProps->model_name)
                 $this->getModelFields();
-            $content = file_get_contents(base_path("app/Cih/templates/view.txt"));
+
+            // single or plural view content
+            if ($this->autoGenerateProps->is_singular === true)
+                $content = file_get_contents(base_path("app/Cih/templates/view_singular.txt"));
+            else
+                $content = file_get_contents(base_path("app/Cih/templates/view.txt"));
         } else {
-            $this->autoGenerateProps->set('view_title', $this->ask("What is the view title?"));
-            $content = file_get_contents(base_path("app/Cih/templates/empty_view.txt"));
+            $this->autoGenerateProps->set('view_title', ucfirst($this->ask("What is the view title?")));
+            $content = file_get_contents(base_path("app/Cih/templates/view_empty.txt"));
         }
 
         $new_content = $this->replaceVars($content);
         $this->storeFile($path, $new_content);
+
+        $this->autoGenerateProps->set('route_folder', $this->autoGenerateProps->route_folder_init);
+        $this->autoGenerateProps->set('view_folder', $this->autoGenerateProps->view_folder_init);
 
         $this->autoGenerateProps->save($this->autoGenerateProps);
     }

@@ -21,5 +21,3 @@ Route::get('/', function () {
 Auth::routes();
 
 // Auth::logout();
-
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

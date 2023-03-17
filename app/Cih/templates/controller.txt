@@ -8,7 +8,7 @@
      * return {model}'s index view
      */
     public function index() {
-        return view($this->folder.'{model}', []);
+        return view($this->folder.'{view_name}', []);
     }
 
     /**

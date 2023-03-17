@@ -5,10 +5,10 @@ namespace App\Models\Core;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Admin extends Model
+class Team extends Model
 {
     use HasFactory;
 
-	protected $fillable = ["name"];
+	protected $fillable = ["name", "status", "slug"];
 
 }
