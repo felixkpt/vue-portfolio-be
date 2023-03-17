@@ -189,12 +189,12 @@ class Controller extends Command
 
 
         // Updating default name
-        $this->autoGenerateProps->set('default_name', $controller_name);
-
+        $default_name = preg_replace("#Controller$#", "", $controller_name);
+        $this->autoGenerateProps->set('default_name', $default_name);
         // Let guess the model name
-        if (!$this->autoGenerateProps->model_name)
-            $this->setModel($controller_name);
-
+        if (!$this->autoGenerateProps->model_name) {
+            $this->setModel($default_name);
+        }
 
         $controller_name = preg_match("#Controller$#", $controller_name) ? $controller_name : $controller_name . 'Controller';
         $this->autoGenerateProps->set('controller_name', $controller_name);

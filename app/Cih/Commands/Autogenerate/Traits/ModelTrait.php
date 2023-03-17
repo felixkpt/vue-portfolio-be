@@ -96,6 +96,8 @@ trait ModelTrait
 
                 if (strlen($field_name) > 0) {
 
+                    $field_name = Str::slug(Str::kebab(strtolower($field_name)), '_');
+
                     $invalid = in_array($field_name, $columntypes);
 
                     if ($invalid === true) {
@@ -110,8 +112,6 @@ trait ModelTrait
             if (strtolower($field_name) == 'n') {
                 $add_more = 0;
             } else {
-
-                $field_name = Str::slug(Str::kebab($field_name), '_');
 
                 if ($is_create_model === false) {
 

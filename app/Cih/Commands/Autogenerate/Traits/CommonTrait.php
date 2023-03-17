@@ -72,6 +72,7 @@ trait CommonTrait
 
     function setModel($model_name)
     {
+
         $this->autoGenerateProps->set('default_name', $model_name);
 
         $model_name = Str::singular(Str::studly($model_name));
