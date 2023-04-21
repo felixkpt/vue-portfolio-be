@@ -1,77 +1,84 @@
-@extends('layouts.app')
+@extends('auth.main')
+@section('title')
+    Register | {{ config('app.name', 'Calltronix Kenya Limited') }}
+@endsection
 
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Register') }}</div>
-
-                <div class="card-body">
-                    <form method="POST" action="{{ route('register') }}">
-                        @csrf
-
-                        <div class="row mb-3">
-                            <label for="name" class="col-md-4 col-form-label text-md-end">{{ __('Name') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name') }}" required autocomplete="name" autofocus>
-
-                                @error('name')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <label for="email" class="col-md-4 col-form-label text-md-end">{{ __('Email Address') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email">
-
-                                @error('email')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <label for="password" class="col-md-4 col-form-label text-md-end">{{ __('Password') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="new-password">
-
-                                @error('password')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <label for="password-confirm" class="col-md-4 col-form-label text-md-end">{{ __('Confirm Password') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required autocomplete="new-password">
-                            </div>
-                        </div>
-
-                        <div class="row mb-0">
-                            <div class="col-md-6 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
-                                    {{ __('Register') }}
-                                </button>
-                            </div>
-                        </div>
-                    </form>
+    <div class="card-body">
+        <form method="POST" action="{{ url('register-user') }}" class="ajax-post">
+            @csrf
+            <div class="row">
+                <div class="form-group mb-50 pl-0 col-md-6">
+                    <label class="text-bold-600" for="name">First Name</label>
+                    <input type="text" class="form-control" name="first_name"
+                           placeholder="First Name">
+                </div>
+                <div class="form-group mb-50 pr-0 col-md-6">
+                    <label class="text-bold-600" for="name">Last Name</label>
+                    <input type="text" class="form-control" name="last_name"
+                           placeholder="Last Name">
                 </div>
             </div>
-        </div>
+            <div class="row">
+
+                <div class="form-group mb-50 pl-0 col-md-6">
+                    <label class="text-bold-600" for="name">Middle Name</label>
+                    <input type="text" class="form-control" name="middle_name"
+                           placeholder="Middle Name">
+                </div>
+
+                <div class="form-group mb-50 pr-0 col-md-6">
+                    <label class="text-bold-600" for="email">Phone number</label>
+                    <input name="phone" class="form-control"
+                           placeholder="Phone Number">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-group mb-50 pl-0 col-md-6">
+                    <label class="text-bold-600 col-md-12" for="email">Email address </label>
+                    <input name="email" class="form-control"
+                           placeholder="Email address ">
+                </div>
+                <div class="form-group mb-50 pr-0 col-md-6">
+                    <label class="text-bold-600" for="email">Department</label>
+                    <select name="department_id" class="form-control select2">
+                        {{--                                    @foreach($departments as $department)--}}
+                        {{--                                        <option value="{{ $department->id }}">{{ $department->name }}</option>--}}
+                        {{--                                        @endforeach--}}
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group mb-50 pl-0 col-md-6">
+                    <label class="text-bold-600" for="password">Password</label>
+                    <input type="password" name="password" class="form-control" id="password"
+                           placeholder="Password">
+                </div>
+                <div class="form-group mb-50 pr-0 col-md-6">
+                    <label class="text-bold-600" for="password_confirmation"> Confirm Password</label>
+                    <input type="password" name="password_confirmation" id="password_confirmation"
+                           class="form-control"
+                           placeholder="Confirm Password">
+                </div>
+            </div>
+
+            <div class="row col-md-12 text-center mt-2">
+                <div class="col-md-12">
+                    <button style="color: #fff;background-color: #0072bc; border-color: #0072bc;" type="submit"
+                            class="btn glow position-relative submit submit-btn">
+                        SIGN UP <i class="bx bx-right-arrow-alt"></i></button>
+                </div>
+            </div>
+        </form>
+        <hr>
+        <div class="text-center"><small class="mr-25">Already have an account?</small><a
+                class="load-page" href="{{url('login')}}"><small>Sign in</small> </a></div>
     </div>
-</div>
+    <script type="application/javascript" >
+        $(function () {
+            autoFillSelect('department_id', '{{ url('calltronix-departments/list?all=1') }}')
+        })
+    </script>
+
 @endsection

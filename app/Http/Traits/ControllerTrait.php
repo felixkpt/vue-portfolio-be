@@ -19,4 +19,23 @@ trait ControllerTrait
 
         $this->folder = strtolower($folder);
     }
+
+    function getValidationFields(string $model, array $except = [])
+    {
+        $model = new $model();
+        $fillables = $model->getFillable();
+
+        $fillables = array_values(array_diff($fillables, $except));
+
+        $validation_array = [];
+        foreach ($fillables as $field) {
+            $validation_array[$field] = 'required';
+        }
+        if (in_array("file", $fillables)) {
+            $validation_array['file'] = 'required|max:50000';
+        }
+
+        return $validation_array;
+    }
+
 }

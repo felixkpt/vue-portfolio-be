@@ -1,47 +1,66 @@
-@extends('layouts.app')
-
+@extends('auth.main')
+@section('title')
+    Forgot Password | {{ config('app.name', 'Calltronix Kenya Limited') }}
+@endsection
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Reset Password') }}</div>
-
-                <div class="card-body">
-                    @if (session('status'))
-                        <div class="alert alert-success" role="alert">
-                            {{ session('status') }}
-                        </div>
-                    @endif
-
-                    <form method="POST" action="{{ route('password.email') }}">
-                        @csrf
-
-                        <div class="row mb-3">
-                            <label for="email" class="col-md-4 col-form-label text-md-end">{{ __('Email Address') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
-
-                                @error('email')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="row mb-0">
-                            <div class="col-md-6 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
-                                    {{ __('Send Password Reset Link') }}
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+    <div class="card-body">
+        <div class="divider">
+            <div class="divider-text text-uppercase text-muted">
+                <small> Password Reset</small>
             </div>
         </div>
+        <div class="text-muted text-center mb-2"><small>Enter the email or phone number you
+                used
+                when you joined
+                and we will send you temporary password</small></div>
+        <form method="POST" action="{{ route('password.email') }}">
+            @csrf
+            @if (session('status'))
+                <div class="alert alert-success" role="alert">
+                    {{ session('status') }}
+                </div>
+            @endif
+            <div class="form-group mb-2">
+                <label class="text-bold-600" for="emailaddress">Email </label>
+                <input type="text" class="form-control {{ $errors->has('email') ? ' is-invalid' : '' }}"
+                       id="emailaddress"
+                       placeholder="Enter your email" name="email" value="{{ old('email') }}">
+                @if ($errors->has('email'))
+                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $errors->first('email') }}</strong>
+                                    </span>
+                @endif
+            </div>
+            <button style="color: #fff;background-color: #0072bc; border-color: #0072bc;" type="submit"
+                    class="btn glow position-relative w-100">SEND
+                PASSWORD<i id="icon-arrow" class="bx bx-right-arrow-alt"></i>
+            </button>
+        </form>
+        <hr/>
+        <div
+            class="form-group d-flex flex-md-row flex-column justify-content-between align-items-center ">
+            <div class="text-center">
+                <small class="text-muted ">
+                    I remembered my password
+                </small>
+
+                <a href="{{ route('login') }}"
+                   class="card-link load-page"><small>login</small>
+                </a>
+            </div>
+        </div>
+
+        <div class="text-center text-sm-center  mb-2" style="font-size: 0.8rem;">
+
+            &copy; {{ date('Y') }}
+            @if(@$organization->copy_right_text) {{ @$organization->copy_right_text }}
+            @else
+                Calltronix Kenya Ltd
+            @endif
+            <span
+                style="background-color:#0072bc;padding: 2px 3px;font-weight: 500;line-height: 10px;"
+                class="badge badge-info"><small>Version 1.0</small></span>
+        </div>
+
     </div>
-</div>
 @endsection

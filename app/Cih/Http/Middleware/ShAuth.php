@@ -25,7 +25,7 @@ class ShAuth
     public function handle($request, Closure $next)
     {
         $role_repo = new RoleRepository($request);
-        // $role_repo->check();
+        $role_repo->check();
         return $next($request);
     }
 }

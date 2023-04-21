@@ -1,91 +1,68 @@
-@extends('layouts.app')
-
+@extends('auth.main')
+@section('title')
+    Reset Password | {{ config('app.name', 'Calltronix Kenya  Limited') }}
+@endsection
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Reset Password') }}</div>
-
-                <div class="card-body">
-                    <form method="POST" action="{{ route('password.update') }}">
-                        @csrf
-
-                        <input type="hidden" name="token" value="{{ $token }}">
-
-                        <div class="row mb-3">
-                            <label for="email" class="col-md-4 col-form-label text-md-end">{{ __('Email Address') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ $email ?? old('email') }}" required autocomplete="email" autofocus>
-
-                                @error('email')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <label for="password" class="col-md-4 col-form-label text-md-end">{{ __('Password') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="new-password">
-
-                                @error('password')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <label for="password-confirm" class="col-md-4 col-form-label text-md-end">{{ __('Confirm Password') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required autocomplete="new-password">
-                            </div>
-                        </div>
-
-                        <div class="row mb-0">
-                            <div class="col-md-6 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
-                                    {{ __('Reset Password') }}
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-
-
-                    <div class="password-hint-wrapper d-none">
-                        <br>
-                        <h6>Password requirements</h6>
-                        <div class="hint is-long-enough hint-valid">
-                          <svg class="malibu-icon malibu-icon-dark-gray">
-                            <use xlink:href="#confirm-16"></use>
-                          </svg>
-                          Must be a minimum of 8 characters.
-                        </div>
-              
-                        <div class="hint has-all-characters hint-valid">
-                          <svg class="malibu-icon malibu-icon-dark-gray">
-                            <use xlink:href="#confirm-16"></use>
-                          </svg>
-                          Must contain letters, numbers, and symbols.
-                        </div>
-              
-                        <div class="hint passwords-match hint-valid">
-                          <svg class="malibu-icon malibu-icon-dark-gray">
-                            <use xlink:href="#confirm-16"></use>
-                          </svg>
-                          Passwords must match.
-                        </div>
-                      </div>
-                </div>
+    <div class="card-body">
+        <div class="divider">
+            <div class="divider-text text-uppercase text-muted">
+                <small> Password Reset</small>
             </div>
         </div>
+        <form method="POST" action="{{ route('password.update') }}">
+            @csrf
+            <input type="hidden" name="token" value="{{ $token }}">
+            <div class="form-group">
+                <label class="text-bold-600" for="emailaddress">Email address</label>
+                <input class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }}"
+                       value="{{ $email ?? old('email') }}" type="email" name="email" id="email"
+                       placeholder="Enter your email" required>
+                @if ($errors->has('email'))
+                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $errors->first('email') }}</strong>
+                                    </span>
+                @endif
+            </div>
+            <div class="form-group">
+                <label class="text-bold-600" for="exampleInputPassword1">New Password</label>
+                <input class="form-control{{ $errors->has('password') ? ' is-invalid' : '' }}"
+                       name="password" required type="password" id="password"
+                       placeholder="Enter your password">
+                @if ($errors->has('password'))
+                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $errors->first('password') }}</strong>
+                                    </span>
+                @endif
+
+            </div>
+            <div class="form-group mb-2">
+                <label class="text-bold-600" for="exampleInputPassword2">Confirm New
+                    Password</label>
+                <input class="form-control{{ $errors->has('password_confirmation') ? ' is-invalid' : '' }}"
+                       name="password_confirmation" required type="password" id="password_confirmation"
+                       placeholder="Enter your password again">
+                @if ($errors->has('password_confirmation'))
+                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $errors->first('password_confirmation') }}</strong>
+                                    </span>
+                @endif
+            </div>
+            <button style="color: #fff;background-color: #0072bc; border-color: #0072bc;" type="submit"
+                    class="btn glow position-relative w-100">Reset my
+                password<i id="icon-arrow" class="bx bx-right-arrow-alt"></i></button>
+
+        </form>
+        <hr/>
+        <div class="text-center  mb-2">
+
+            &copy; {{ date('Y') }}
+            @if(@$organization->copy_right_text) {{ @$organization->copy_right_text }}
+            @else
+                Calltronix Kenya Ltd
+            @endif
+            <span
+                style="background-color:#0072bc;padding: 2px 3px;font-weight: 500;line-height: 10px;"
+                class="badge badge-info"><small>Version 1.0</small></span>
+        </div>
     </div>
-</div>
 @endsection

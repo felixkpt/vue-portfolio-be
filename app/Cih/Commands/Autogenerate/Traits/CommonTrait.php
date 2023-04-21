@@ -37,7 +37,7 @@ trait CommonTrait
         return implode($replace, explode($find, $subject, 2));
     }
 
-    public function replaceVars($content, $t = false)
+    public function replaceVars($content)
     {
         $model = strtolower($this->autoGenerateProps->model_name);
         $umodel = $this->autoGenerateProps->model_name;

@@ -1,0 +1,166 @@
+/*
+  ##Device = Desktops
+  ##Screen = 1281px to higher resolution desktops
+*/
+
+@media (min-width: 1281px) {
+    .add_button > span.select2-container {
+        width: 87% !important;
+    }
+}
+
+
+/*
+  ##Device = Laptops, Desktops
+  ##Screen = B/w 1025px to 1280px
+*/
+
+@media (min-width: 1025px) and (max-width: 1280px) {
+
+    .add_button > span.select2-container {
+        width: 85% !important;
+    }
+
+}
+
+/*
+  ##Device = Tablets, Ipads (portrait)
+  ##Screen = B/w 768px to 1024px
+*/
+
+@media (min-width: 768px) and (max-width: 1024px) {
+
+    .add_button > span.select2-container {
+        width: 82% !important;
+    }
+    .titlecolumn {
+        margin-bottom: 7px!important;
+    }
+}
+
+/*
+  ##Device = Tablets, Ipads (landscape)
+  ##Screen = B/w 768px to 1024px
+*/
+
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+
+    .add_button > span.select2-container {
+        width: 87% !important;
+    }
+    .main_content {
+        width: 100%;
+        padding-right: 1px!important;
+        padding-left: 1px!important;
+        margin-right: auto;
+        margin-left: auto;
+    }
+    .dashboard_content {
+        width: 100%;
+        padding-right: 5px!important;
+        padding-left: 5px!important;
+        margin-right: auto;
+        margin-left: auto;
+    }
+    .titlecolumn {
+        margin-bottom: 7px!important;
+    }
+    .main_table_bdy{
+        margin-top: 10px;
+    }
+
+}
+
+/*
+  ##Device = Low Resolution Tablets, Mobiles (Landscape)
+  ##Screen = B/w 481px to 767px
+*/
+
+@media (min-width: 481px) and (max-width: 767px) {
+
+    .add_button > span.select2-container {
+        width: 82% !important;
+    }
+    .main_content {
+        width: 100%;
+        padding-right: 1px!important;
+        padding-left: 1px!important;
+        margin-right: auto;
+        margin-left: auto;
+    }
+    .dashboard_content {
+        width: 100%;
+        padding-right: 5px!important;
+        padding-left: 5px!important;
+        margin-right: auto;
+        margin-left: auto;
+    }
+    .titlecolumn {
+        margin-bottom: 7px!important;
+    }
+    .titlecolumn th {
+        background: #dcd2d26b;
+        white-space: nowrap;
+        text-align: right;
+        font-weight: bold;
+        /* width: 5%; */
+    }
+    .main_table_bdy{
+        margin-top: 10px;
+    }
+
+}
+
+/*
+  ##Device = Most of the Smartphones Mobiles (Portrait)
+  ##Screen = B/w 320px to 479px
+*/
+
+@media (min-width: 320px) and (max-width: 480px) {
+
+    .content {
+        padding: 0.25rem 0.25rem;
+        -ms-flex-positive: 1;
+        flex-grow: 1;
+    }
+
+    .card-body {
+        -ms-flex: 1 1 auto;
+        flex: 1 1 auto;
+        padding: 0.4rem;
+    }
+
+    .add_button > span.select2-container {
+        width: 82% !important;
+    }
+
+    .main_content {
+        width: 100%;
+        padding-right: 1px!important;
+        padding-left: 1px!important;
+        margin-right: auto;
+        margin-left: auto;
+    }
+    .dashboard_content {
+        width: 100%;
+        padding-right: 5px!important;
+        padding-left: 5px!important;
+        margin-right: auto;
+        margin-left: auto;
+    }
+    .titlecolumn {
+        margin-bottom: 7px!important;
+    }
+    .titlecolumn th {
+        background: #dcd2d26b;
+        white-space: nowrap;
+        text-align: right;
+        font-weight: bold;
+        /* width: 5%; */
+    }
+    .main_table_bdy{
+        margin-top: 10px;
+    }
+}
+
+

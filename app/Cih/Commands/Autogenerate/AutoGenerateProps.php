@@ -37,11 +37,11 @@ class AutoGenerateProps
     /**
      * @prop route_index either index|filename
      */
-    public $route_index = 'index';
+    public $route_index = 'filename';
     /**
      * @prop route_index either index|filename
      */
-    public $view_index = 'filename';
+    public $view_index = 'index';
     
     public $route_or_view_name;
 

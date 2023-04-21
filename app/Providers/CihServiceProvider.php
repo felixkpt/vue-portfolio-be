@@ -20,7 +20,7 @@ class CihServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        require base_path('app/Repository/helperrepo.php');
+        require base_path('app/Repositories/helperrepo.php');
     }
 
     /**

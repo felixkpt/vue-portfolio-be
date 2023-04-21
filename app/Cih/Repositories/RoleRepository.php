@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: iankibet
@@ -8,10 +9,11 @@
 
 namespace App\Cih\Repositories;
 
-use App\Models\Core\DepartmentPermission;
+use App\Models\Core\Permission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Shara\Framework\Repositories\UserGroup;
@@ -30,21 +32,21 @@ class RoleRepository
 
     public function __construct(Request $request = null)
     {
-        if($request) {
+        if ($request) {
             $this->request = $request;
-            $this->user = Auth::user();
+            $this->user = currentUser();
             $this->path = Route::getFacadeRoot()->current()->uri();
         }
     }
 
     public function check($allow = false)
     {
-        if (Auth::user()) {
+
+        if (currentUser()) {
             $this->authorize([]);
         } else {
             App::abort(403, "Not authorized to access this page/resource/endpoint");
         }
-
     }
 
     protected function extractFromAllUrls()
@@ -52,21 +54,21 @@ class RoleRepository
         $user = $this->user;
         $role = $user->role;
         $urls = [];
-    
+
         if ($role == 'admin') {
             $allowed_permissions = [];
             if ($user->department) {
-                $modules = DepartmentPermission::where('department_id',$user->department_id)->get();
-                foreach ($modules as $module){
-//                    $urls = @json_decode($module->urls);
-//                    if($urls){
-//                        $allowed_urls = array_merge($allowed_urls,$urls);
-//                    }
+                $modules = Permission::where('permission_group_id', $user->permission_group_id)->get();
+                foreach ($modules as $module) {
+                    //                    $urls = @json_decode($module->urls);
+                    //                    if($urls){
+                    //                        $allowed_urls = array_merge($allowed_urls,$urls);
+                    //                    }
                     $slugs = @json_decode($module->permissions);
-                    if($slugs){
+                    if ($slugs) {
                         $permissions[] = $module->module;
-                        foreach ($slugs as $slug){
-                            $permissions[] = $module->module.'.'.$slug;
+                        foreach ($slugs as $slug) {
+                            $permissions[] = $module->module . '.' . $slug;
                         }
                     }
                 }
@@ -78,83 +80,85 @@ class RoleRepository
         $this->allowedPermissions = $allowed_permissions;
         $this->role = $role;
         $urls = [];
-        if(file_exists(storage_path('app/permissions/rules.json'))){
+        if (file_exists(storage_path('app/permissions/rules.json'))) {
             $allPermissionsFile = storage_path('app/permissions/rules.json');
         } else {
-            $allPermissionsFile = __DIR__.'/../../templates/allPermissions.json';
+            $allPermissionsFile = __DIR__ . '/../../templates/allPermissions.json';
         }
         $allPermissions = @json_decode(@file_get_contents($allPermissionsFile));
         $modules = Storage::files('permissions/modules');
-        foreach ($modules as $module){
-            $moduleArr = explode('/',$module);
-            $moduleSlug = str_replace('.json','',$moduleArr[count($moduleArr)-1]);
+        foreach ($modules as $module) {
+            $moduleArr = explode('/', $module);
+            $moduleSlug = str_replace('.json', '', $moduleArr[count($moduleArr) - 1]);
             $modulePermissions = json_decode(Storage::get($module));
             $allPermissions->$moduleSlug = $modulePermissions;
         }
         foreach ($allPermissions as $slug => $allPermission) {
-            $foundUrls = $this->getBlockUrls($allPermission,$slug, $allPermission->main);
-            $urls = array_merge($urls,$foundUrls);
+            $foundUrls = $this->getBlockUrls($allPermission, $slug, $allPermission->main);
+            $urls = array_merge($urls, $foundUrls);
         }
         return $urls;
     }
-    public function extractRoleUrls($departmentModule,$slugs,$role='admin')
+    public function extractRoleUrls($departmentModule, $slugs, $role = 'admin')
     {
         $urls = [];
         $allowed_permissions = [];
-        foreach ($slugs as $slug){
-            $allowed_permissions[] = $departmentModule.'.'.$slug;
+        foreach ($slugs as $slug) {
+            $allowed_permissions[] = $departmentModule . '.' . $slug;
         }
         $this->allowedPermissions = $allowed_permissions;
         $this->role = $role;
-        if(file_exists(storage_path('app/permissions/rules.json'))){
+        if (file_exists(storage_path('app/permissions/rules.json'))) {
             $allPermissionsFile = storage_path('app/permissions/rules.json');
         } else {
-            $allPermissionsFile = __DIR__.'/../../templates/allPermissions.json';
+            $allPermissionsFile = __DIR__ . '/../../templates/allPermissions.json';
         }
+
         $allPermissions = @json_decode(@file_get_contents($allPermissionsFile));
         $modules = Storage::files('permissions/modules');
-        foreach ($modules as $module){
-            $moduleArr = explode('/',$module);
-            $moduleSlug = str_replace('.json','',$moduleArr[count($moduleArr)-1]);
+        foreach ($modules as $module) {
+            $moduleArr = explode('/', $module);
+            $moduleSlug = str_replace('.json', '', $moduleArr[count($moduleArr) - 1]);
             $modulePermissions = json_decode(Storage::get($module));
             $allPermissions->$moduleSlug = $modulePermissions;
         }
         $allPermission = $allPermissions->$departmentModule;
-//        $main = $allPermission->main;
-//        if(isset($allPermission->urls)){
-//            foreach ($allowed_permissions->urls as $url){
-//
-//            }
-//        }
-        $foundUrls = $this->getBlockUrls($allPermission,$slug, $allPermission->main);
-        $urls = array_merge($urls,$foundUrls);
+        //        $main = $allPermission->main;
+        //        if(isset($allPermission->urls)){
+        //            foreach ($allowed_permissions->urls as $url){
+        //
+        //            }
+        //        }
+        $foundUrls = $this->getBlockUrls($allPermission, $slug, $allPermission->main);
+        $urls = array_merge($urls, $foundUrls);
         return $urls;
     }
     protected $allowedPermissions;
     protected $role;
     protected $urls = [];
     protected $loopLevel = 0;
-    protected function getBlockUrls($block, $slug, $mainUrl = null, $urls=[]){
+    protected function getBlockUrls($block, $slug, $mainUrl = null, $urls = [])
+    {
         $mainSlug = $slug;
         $roles = $block->roles;
         $foundUrls = [];
         if (in_array($this->role, $roles)) {
-            $extractedUrls = $this->extractMainBlock($block,$mainUrl);
+            $extractedUrls = $this->extractMainBlock($block, $mainUrl);
             $foundUrls = array_merge($foundUrls, $extractedUrls);
         }
-        $urls = array_merge($urls,$foundUrls);
-        if(isset($block->children)){
+        $urls = array_merge($urls, $foundUrls);
+        if (isset($block->children)) {
             foreach ($block->children as $childSlug => $child) {
-                if(substr($child->main, 0,1) == '/'){
-                    $childrenMain = trim($child->main,'/');
+                if (substr($child->main, 0, 1) == '/') {
+                    $childrenMain = trim($child->main, '/');
                 } else {
-                    $childrenMain = trim($mainUrl.'/'.$child->main,'/');
+                    $childrenMain = trim($mainUrl . '/' . $child->main, '/');
                 }
-                $extractedUrls = $this->extractMainBlock($child,$childrenMain);
+                $extractedUrls = $this->extractMainBlock($child, $childrenMain);
                 $foundUrls = array_merge($foundUrls, $extractedUrls);
-                $urls = array_merge($urls,$foundUrls);
-                $blockUrls = $this->getBlockUrls($child,$childSlug,$childrenMain ,$urls);
-                $urls = array_merge($urls,$blockUrls);
+                $urls = array_merge($urls, $foundUrls);
+                $blockUrls = $this->getBlockUrls($child, $childSlug, $childrenMain, $urls);
+                $urls = array_merge($urls, $blockUrls);
             }
         }
         $urls = array_unique($urls);
@@ -163,96 +167,103 @@ class RoleRepository
 
     public static function getRolePermissions($role, $returnModules = 0)
     {
-        
+
         $menus = null;
-        if(file_exists(storage_path('app/permissions/rules.json'))){
+        if (file_exists(storage_path('app/permissions/rules.json'))) {
             $allPermissionsFile = storage_path('app/permissions/rules.json');
         } else {
-            $allPermissionsFile = __DIR__.'/../../templates/allPermissions.json';
+            $allPermissionsFile = storage_path('app/permissions/constantRoutes.json');
         }
+
         $modules = Storage::files('permissions/modules');
         $allPermissions = json_decode(file_get_contents($allPermissionsFile));
         $modules_arr = [];
-        foreach ($modules as $module){
-            $moduleArr = explode('/',$module);
-            $moduleSlug = str_replace('.json','',$moduleArr[count($moduleArr)-1]);
+        foreach ($modules as $module) {
+            $moduleArr = explode('/', $module);
+            $moduleSlug = str_replace('.json', '', $moduleArr[count($moduleArr) - 1]);
             $modulePermissions = json_decode(Storage::get($module));
             $allPermissions->$moduleSlug = $modulePermissions;
             $modules_arr[] = $moduleSlug;
         }
         $slugs = [];
+
+        // dd($allPermissions);
+
         foreach ($allPermissions as $slug => $allPermission) {
             $modules_arr[] = $slug;
-            if(!$returnModules){
-                $new_slugs = self::getPermissionSlugs($allPermission, $slug,$role);
+            if (!$returnModules) {
+                $new_slugs = self::getPermissionSlugs($allPermission, $slug, $role);
                 $slugs = array_merge($slugs, $new_slugs);
             }
         }
-        if($returnModules){
+        if ($returnModules) {
             return $modules_arr;
         }
         return $slugs;
     }
     public static function getModulePermissions($role, $reqModule)
     {
-        
+
         $menus = null;
-        if(file_exists(storage_path('app/permissions/rules.json'))){
+        if (file_exists(storage_path('app/permissions/rules.json'))) {
             $allPermissionsFile = storage_path('app/permissions/rules.json');
         } else {
-            $allPermissionsFile = __DIR__.'/../../templates/allPermissions.json';
+            $allPermissionsFile = storage_path('app/permissions/constantRoutes.json');
         }
         $modules = Storage::files('permissions/modules');
         $allPermissions = json_decode(file_get_contents($allPermissionsFile));
         $modules_arr = [];
-        
-        foreach ($modules as $module){
-            $moduleArr = explode('/',$module);
-            $moduleSlug = str_replace('.json','',$moduleArr[count($moduleArr)-1]);
+
+        foreach ($modules as $module) {
+            $moduleArr = explode('/', $module);
+            $moduleSlug = str_replace('.json', '', $moduleArr[count($moduleArr) - 1]);
             $modulePermissions = json_decode(Storage::get($module));
             $allPermissions->$moduleSlug = $modulePermissions;
         }
-        try{
-            $slugs = self::getPermissionSlugs($allPermissions->$reqModule, null,$role);
-        }catch (\Exception $e){
-//            dd($reqModule);
+        try {
+            $slugs = self::getPermissionSlugs($allPermissions->$reqModule, null, $role);
+        } catch (\Exception $e) {
+            //            dd($reqModule);
             throw new \Exception("invalid module config in: $reqModule.json");
         }
         return $slugs;
     }
 
-    protected static function getPermissionSlugs($allPermission, $slug,$role,$slugs = []){
-        
+    protected static function getPermissionSlugs($allPermission, $slug, $role, $slugs = [])
+    {
+
+        // dd($allPermission);
+
         $mainSlug = $slug;
-        $roles = $allPermission->roles;
+        $roles = $allPermission->roles ?? [];
         $newSlugs = [];
         if (in_array($role, $roles)) {
-            if($mainSlug){
+            if ($mainSlug) {
                 $newSlugs[] = $mainSlug;
             }
         }
-        $slugs = array_merge($slugs,$newSlugs);
-        if(isset($allPermission->children)) {
+        $slugs = array_merge($slugs, $newSlugs);
+        if (isset($allPermission->children)) {
             foreach ($allPermission->children as $childSlug => $childPermission) {
-                if($mainSlug){
+                if ($mainSlug) {
                     $full_slug = $mainSlug . '.' . $childSlug;
                 } else {
                     $full_slug = $childSlug;
                 }
-                $slugs = self::getPermissionSlugs($childPermission,$full_slug,$role, $slugs);
+                $slugs = self::getPermissionSlugs($childPermission, $full_slug, $role, $slugs);
             }
         }
         return $slugs;
     }
 
-    protected function extractMainBlock($permission, $mainUrl=null)
+    protected function extractMainBlock($permission, $mainUrl = null)
     {
         $urls = [];
         if (isset($permission->urls)) {
             $permissionUrls = $permission->urls;
             $urls = $this->extractPermissionUrls($permissionUrls, $mainUrl);
         }
-        $urls[] = trim($mainUrl,'/');
+        $urls[] = trim($mainUrl, '/');
         return $urls;
     }
 
@@ -269,48 +280,95 @@ class RoleRepository
         return $urls;
     }
 
-    protected function getAllowedUrls(){
+    protected function getAllowedUrls()
+    {
+
         $permissionsRepo = new PermissionsRepository();
-        $allowed_urls = session()->get('allowed_urls',[]);
-        $permissions = session()->get('permissions',[]);
+        $allowed_urls = session()->get('allowed_urls', []);
+        $permissions = session()->get('permissions', []);
         $user = $this->user;
         $role = $user->role;
-        if($role == 'admin'){
-            $modules = DepartmentPermission::where('department_id',$user->department_id)->get();
-            foreach ($modules as $module){
+
+        if ($role == 'admin') {
+
+            $modules = Permission::where('permission_group_id', $user->permission_group_id)
+                // ->where('id', 7)
+                ->where("module", "permissiongroups")
+                ->get();
+
+            foreach ($modules as $module) {
                 $urls = @json_decode($module->urls);
-                if($urls){
-                    $allowed_urls = array_merge($allowed_urls,$urls);
+
+
+                if ($urls) {
+                    $allowed_urls = array_merge($allowed_urls, $urls);
                 }
+
                 $slugs = @json_decode($module->permissions);
-                if($slugs){
+
+                if ($slugs) {
                     $permissions[] = $module->module;
-                    foreach ($slugs as $slug){
-                        $permissions[] = $module->module.'.'.$slug;
-                    }
+
+                    // map for the module.{permission_slug}
+                    $permissions = array_map(fn ($slug) => $slug, $slugs);
                 }
             }
-           $allowed_urls = $permissionsRepo->getAllowedUrls($permissions);
+
+            // dd($permissions);
+
+            $allowed_urls = $permissionsRepo->getAllowedUrls($permissions);
         } else {
             $allowed_urls = $permissionsRepo->getAllowedUrls();
         }
+
         return $allowed_urls;
+    }
+
+    private function checkIfUrlIsAllowed()
+    {
+
+        $current = request()->getPathInfo();
+
+        $parts = explode('/', $current);
+
+        $path_to_route_permissions = '';
+        $index = '';
+        for ($i = count($parts); $i > 0; $i--) {
+            $uri = implode('/', $parts);
+
+            if (is_dir(base_path('routes' . $uri))) {
+                $index = file_exists(base_path('routes' . $uri . '/' . end($parts) . '.route.php')) ? end($parts) . '.json' : 'index.json';
+                $path_to_route_permissions = ltrim($uri . '/' . $index, '/');
+                break;
+            }
+
+            array_pop($parts);
+        }
+
+
+        $file = 'app/permissions/' . $path_to_route_permissions;
+        $folder = preg_replace('#/' . $index . '$#', '', $file);
+
+        if (!File::exists(storage_path($file))) {
+            File::ensureDirectoryExists(storage_path($folder));
+            File::put(storage_path($file), 'null');
+            File::chmod(storage_path($file), 774);
+        }
+
+        $route_permissions = json_decode(File::get(storage_path($file)));
+           dd($route_permissions);
     }
 
     protected function authorize($backend)
     {
-        $current = preg_replace('/\d/', '', $this->path);
-        $current = preg_replace('/{(.*?)}/', '', $current);
-        $current = rtrim($current, '/');
-        $current = str_replace("//", "/", $current);
-        $current = str_replace("//", "/", $current);
-        $current = str_replace("//", "/", $current);
-        $user = $this->user;
-        $allowed_urls = $this->getAllowedUrls();
-//        return $allowed_urls;
 
-//        dd($this->path,$business_urls);
-//        dd($current,$allowed_urls);
+        $user = $this->user;
+        $allowed_urls = $this->checkIfUrlIsAllowed();
+        dd($allowed_urls);
+        //        return $allowed_urls;
+
+        //        dd($this->path,$business_urls);
+        //        dd($current,$allowed_urls);
         $allowed_urls[] = '/';
         $allowed_urls[] = '';
         $allowed_urls[] = 'auth/user';
@@ -318,6 +376,8 @@ class RoleRepository
         if (strpos($current, 'api') !== false) {
             $current = substr_replace($current, '', 0, 4);
         }
+
+
         if (!in_array($current, $allowed_urls)) {
             $this->unauthorized();
         }
@@ -328,7 +388,6 @@ class RoleRepository
         $allowed = [];
         if ($this->user->role == 'business') {
             $group_permissions = $this->user->userGroup->permissions;
-
         } elseif ($this->user->role == 'super') {
             $group_permissions = json_decode($this->user->group->permissions);
         }
@@ -348,7 +407,6 @@ class RoleRepository
                     }
                 }
             }
-
         }
         return $allowed;
     }
@@ -452,7 +510,6 @@ class RoleRepository
 
     protected function sanitizeBusinessUrls($urls)
     {
-
     }
 
     public function unauthorized()
@@ -460,7 +517,7 @@ class RoleRepository
         $common_paths = ['logout', 'login', 'register'];
         $path = $this->path;
         if (!in_array($path, $common_paths)) {
-            App::abort(403, "Not authorized to access this page/resource/endpoint");
+            App::abort(502, "Not authorized to access this page/resource/endpoint");
             die('You are not authorized to perform this action');
         }
     }
