@@ -194,32 +194,12 @@ class AuthController extends Controller
         $user->menuCounts = $menuCounts;
         $user->roles = [$user->role];
 
-        $user->permissions = ['/countries', '/countries/list', '/example', '/example/create', '/example/list'];
+        if ($user->permissions) {
+            $permissions = json_decode($user->permissions->permissions);
+            $user->permissions = array_map(fn ($permission)  => preg_replace('#\.#', '/', $permission), $permissions);
+        }
 
-        if ($user->role == 'editor')
-            $user->permissions = [
-                "/dashboard",
-                "/documentation",
-                "/documentation/index",
-                "/guide",
-                "/guide/index",
-                "/nested",
-                "/nested/menu1",
-                "/nested/menu1/menu1-2",
-                "/nested/menu1/menu1-2/menu1-2-1",
-                "/nested/menu1/menu1-2/menu1-2-2",
-                "/nested/menu1/menu1-3",
-                "/example",
-                "/example/create",
-                "/error",
-                "/error/401",
-                "/error/404",
-                "/excel",
-                "/excel/export-excel",
-                "/excel/export-selected-excel",
-                "/zip",
-                "/zip/download",
-            ];
+        // dd($user->permissions);
 
         $user->avatar = asset($user->avatar);
         // unset($user->permissions);

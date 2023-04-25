@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('permissions', function (Blueprint $table) {
             $table->id();
-			$table->string('module');
-            $table->integer('"permission_group_id');
+			$table->string('folder');
+            $table->integer('permission_group_id');
 			$table->json('permissions')->nullable();
 			$table->json('routes')->nullable();
             $table->timestamps();
