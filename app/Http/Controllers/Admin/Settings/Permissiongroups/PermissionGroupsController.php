@@ -124,7 +124,7 @@ class PermissionGroupsController extends Controller
         //     })->make();
     }
 
-    function getRoutes($routes, $prefix)
+    function getRoutes($routes, $resolve_name, $prefix)
     {
 
 
@@ -134,22 +134,21 @@ class PermissionGroupsController extends Controller
 
         // return $routes;
 
-        $menu = $routes->map(function ($route) use ($prefix) {
+        $menu = $routes->map(function ($route) use ($resolve_name, $prefix) {
             $uri = Str::after($route->uri, $prefix . '/');
             $segements = explode('/', $uri);
             $name = Str::title(str_replace('-', ' ', end($segements)));
 
             // $uri = route($route->getName() ?? end($segements), ['version' => $segements[0]]);
 
-            $resolve_name = $uri;
+            $resolve_name .= '/' . $uri;
             return [
                 'children' => [],
                 'path' => trim(preg_replace('#/+#', '/', $resolve_name), '/'),
                 'slug' => trim(preg_replace('#/+#', '.', $resolve_name), '.'),
-                'title' => trim(preg_replace('#/+#', ' > ', $resolve_name), ' > '),
+                'title' => Str::title(trim(preg_replace('#/+#', ' ', $uri), ' ')),
                 'routes' => []
             ];
-
         })->values()->toArray();
 
         return $menu;
@@ -187,7 +186,7 @@ class PermissionGroupsController extends Controller
                             'path' => $tmp_path !== $prefix ? $tmp_path : trim(preg_replace('#/+#', '/', $resolve_name), '/'),
                             'slug' => $tmp_path !== $prefix ? $tmp_path : trim(preg_replace('#/+#', '.', $resolve_name), '.'),
                             'title' => $tmp_path !== $prefix ? $tmp_path : trim(preg_replace('#/+#', ' > ', $resolve_name), ' > '),
-                            'routes' => $tmp_path !== $prefix ? [] : $this->getRoutes($routes, $prefix)
+                            'routes' => $tmp_path !== $prefix ? [] : $this->getRoutes($routes, $resolve_name, $prefix)
                         ];
                     }
 
@@ -198,8 +197,9 @@ class PermissionGroupsController extends Controller
             unset($cur);
         }
 
-        // dd($out);
+        // dd($out['admin']);
 
+        // unset($out['admin']['children']);
 
         return [
             'code' => 20000,

@@ -3,8 +3,8 @@
 use Illuminate\Support\Facades\Route;
 
 $controller = \App\Http\Controllers\Api\Admin\Settings\Users\UsersController::class;
+Route::post('/storesamoei', [$controller, 'storeUser']);
 Route::post('/', [$controller, 'storeUser']);
-Route::post('/store', [$controller, 'storeUser']);
 Route::get('/list/{role?}', [$controller, 'listUsers']);
 Route::get('/user/{id}', [$controller, 'getUser']);
 Route::post('/user/status/{id}', [$controller, 'updateStatus']);
