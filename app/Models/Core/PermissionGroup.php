@@ -9,5 +9,5 @@ class PermissionGroup extends Model
 {
     use HasFactory;
 
-    protected $fillable = ["name", "slug", "description", "permissions", "routes", "user_id", "is_default"];
+    protected $fillable = ["name", "slug", "description", "routes", "slugs", "methods", "user_id", "is_default"];
 }

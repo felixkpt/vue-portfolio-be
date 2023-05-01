@@ -168,41 +168,16 @@ class AuthController extends Controller
 
         if (!$user) return response([], 401);
 
-        if ($user->role == 'admin'  && $user->department_id) {
-            $permissions = [];
-            $modules = Permission::where('permission_group_id', $user->department_id)->get();
-            foreach ($modules as $module) {
-                $mainModule = $module->module;
-                $permissions[] = $mainModule;
-                $modulePermissions = json_decode($module->permissions);
-                if ($modulePermissions) {
-                    foreach ($modulePermissions as $modulePermission) {
-                        if ($modulePermission != $mainModule) {
-                            $permissions[] = $mainModule . '.' . $modulePermission;
-                        }
-                    }
-                }
-            }
-            $user->permissions = json_encode($permissions);
-        } elseif ($user->role != 'admin') {
-            $permissions = RoleRepository::getRolePermissions($user->role);
-            $user->permissions = json_encode($permissions);
-        }
-        $menuCounts = [
-            'slug' => 0 //slug as key then count as integer
-        ];
-        $user->menuCounts = $menuCounts;
         $user->roles = [$user->role];
 
         if ($user->permissions) {
             $permissions = json_decode($user->permissions->permissions);
-            $user->permissions = array_map(fn ($permission)  => preg_replace('#\.#', '/', $permission), $permissions);
+            $routes = json_decode($user->permissions->routes);
+            $user->permissions = $permissions;
+            $user->routes = array_values(array_unique(array_map(fn($route) => preg_split('#@#', $route, 2)[0], $routes)));
         }
 
-        // dd($user->permissions);
-
         $user->avatar = asset($user->avatar);
-        // unset($user->permissions);
 
         return $user;
     }

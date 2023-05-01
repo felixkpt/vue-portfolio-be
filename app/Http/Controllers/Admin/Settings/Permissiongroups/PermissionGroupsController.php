@@ -21,37 +21,50 @@ class PermissionGroupsController extends Controller
      *  Controller Trait
      */
     use ControllerTrait;
+    protected $leftTrim = 'api';
 
     /**
      * return permissiongroup's index view
      */
     public function index()
     {
-        return view($this->folder . 'permission_groups', []);
+        $permissiongroups = PermissionGroup::all();
+
+        return [
+            'code' => 2000,
+            'data' => $permissiongroups
+        ];
     }
 
     /**
      * store permissiongroup
      */
-    public function storePermissionGroup()
+    public function store()
     {
 
-        request()->validate($this->getValidationFields(PermissionGroup::class, ['user_id', 'slug', 'is_default', 'permissions']));
+        request()->validate($this->getValidationFields(PermissionGroup::class, ['user_id', 'slug', 'is_default', 'slugs', 'methods', 'routes']));
 
         $data = \request()->all();
 
-        $data['slug'] = Str::slug($data['slug']);
+        $data['slug'] = Str::slug($data['slug'] ?? $data['name']);
 
-        $permissions = $data['permissions'];
-        $routes = $data['routes'];
+        $routes = (array) $data['routes'];
+        
+        $arr = [];
+        foreach ($routes as $route) {
 
-        $permissions = $this->cleanArray($permissions, '.');
-        $routes = $this->cleanArray($routes, '/');
 
-        $data['permissions'] = json_encode($permissions);
+            $key = $this->search($route['path'], $arr, 'path');
+            if ($key === null)
+                $arr[] = $route;
+            else
+                $arr[$key] = [...$arr[$key], 'methods' => array_values(array_unique([...$arr[$key]['methods'], ...$route['methods']]))];
+        }
+        
+        [$routes, $slugs] = $this->routesSeparete($arr);
+
+        $data['slugs'] = json_encode($slugs);
         $data['routes'] = json_encode($routes);
-
-        // dd($data['permissions']);
 
         if (!isset($data['user_id'])) {
             if (Schema::hasColumn('permission_groups', 'user_id'))
@@ -63,12 +76,35 @@ class PermissionGroupsController extends Controller
             $action = "saved";
         }
 
-        $data['is_default'] = false;
-        if (PermissionGroup::count() === 0)
-            $data['is_default'] = true;
+        if (!request()->id) {
+            $data['is_default'] = false;
+            if (PermissionGroup::count() === 0)
+                $data['is_default'] = true;
+        }
 
         $res = PermissionGroup::updateOrCreate(['id' => request()->id], $data);
         return response(['type' => 'success', 'message' => 'PermissionGroup ' . $action . ' successfully', 'data' => $res]);
+    }
+
+    function search($id, $array, $search_key)
+    {
+        foreach ($array as $key => $val) {
+            if ($val[$search_key] === $id) {
+                return $key;
+            }
+        }
+        return null;
+    }
+
+    function routesSeparete($arr)
+    {
+
+        $routes = $slugs = [];
+        foreach ($arr as $route) {
+            [$routes[], $slugs[]] = [$route['path'], $route['slug']];
+        }
+
+        return [$routes, $slugs];
     }
 
     function cleanArray($array, $separator)
@@ -96,7 +132,7 @@ class PermissionGroupsController extends Controller
     /**
      * return permissiongroup values
      */
-    public function listPermissionGroups()
+    public function list()
     {
         $permissiongroups = PermissionGroup::all();
 
@@ -127,7 +163,6 @@ class PermissionGroupsController extends Controller
     function getRoutes($routes, $resolve_name, $prefix)
     {
 
-
         $routes = collect(Route::getRoutes())->filter(function ($route) use ($prefix) {
             return $route->getAction()['prefix'] === $prefix;
         });
@@ -135,18 +170,27 @@ class PermissionGroupsController extends Controller
         // return $routes;
 
         $menu = $routes->map(function ($route) use ($resolve_name, $prefix) {
-            $uri = Str::after($route->uri, $prefix . '/');
-            $segements = explode('/', $uri);
-            $name = Str::title(str_replace('-', ' ', end($segements)));
 
-            // $uri = route($route->getName() ?? end($segements), ['version' => $segements[0]]);
+            $uri = trim(preg_replace('#^' . $prefix . '#', '', $route->uri), '/');
 
-            $resolve_name .= '/' . $uri;
+            $name = str_replace('-', ' ', $uri);
+            if ($route->uri == $route->getAction()['prefix']) {
+                $name = 'index';
+            }
+
+            if ($route->getName()) {
+                $parts = explode('.', $route->getName());
+                $name = end($parts);
+            }
+
+            $resolve_name .= '/' . trim(preg_replace('#^' . $this->leftTrim . '#', '', $uri), '/');
+            $resolve_name = trim(preg_replace('#/+#', '/', $resolve_name), '/');
+
             return [
                 'children' => [],
-                'path' => trim(preg_replace('#/+#', '/', $resolve_name), '/'),
-                'slug' => trim(preg_replace('#/+#', '.', $resolve_name), '.'),
-                'title' => Str::title(trim(preg_replace('#/+#', ' ', $uri), ' ')),
+                'path' => $this->resolve($resolve_name, '/') . '@' . implode('|@', $route->methods()),
+                'slug' => $this->resolve($resolve_name, '.'),
+                'title' => Str::title(trim(preg_replace('#/+|_|-#', ' ', $name), ' ')),
                 'routes' => []
             ];
         })->values()->toArray();
@@ -154,6 +198,10 @@ class PermissionGroupsController extends Controller
         return $menu;
     }
 
+    function resolve($resolve_name, $seperator)
+    {
+        return trim(preg_replace('#/+#', $seperator, $resolve_name), $seperator);
+    }
     public function listRoutes()
     {
 
@@ -166,7 +214,13 @@ class PermissionGroupsController extends Controller
         foreach ($routes as $route) {
 
             $prefix = $route->getAction()['prefix'];
+
             $resolve_name = $prefix;
+            // if ($prefix != 'api/admin') {
+            //     $resolve_name = preg_replace('#^api#', '', $resolve_name);
+            // } else {
+            $resolve_name = preg_replace('#^' . $this->leftTrim . '#', '', $resolve_name);
+            // }
 
             $parts = explode('/', $prefix);
             $cur = &$out;
@@ -177,15 +231,23 @@ class PermissionGroupsController extends Controller
 
                 $tmp_path = implode('/', $tmp_path_arr);
 
+                $tmp_path_echo = trim(preg_replace('#^' . $this->leftTrim . '#', '', $tmp_path), '/');
+
+                $tmp_path == $tmp_path_echo;
+
                 if ($part !== 'api') {
 
                     if (!key_exists($part, $cur)) {
 
+                        $nam = explode('/', $resolve_name);
+                        $nam = end($nam);
+
+                        $path = $tmp_path !== $prefix ? $tmp_path_echo : trim(preg_replace('#/+#', '/', $resolve_name), '/');
                         $cur[$part] = [
                             'children' => [],
-                            'path' => $tmp_path !== $prefix ? $tmp_path : trim(preg_replace('#/+#', '/', $resolve_name), '/'),
-                            'slug' => $tmp_path !== $prefix ? $tmp_path : trim(preg_replace('#/+#', '.', $resolve_name), '.'),
-                            'title' => $tmp_path !== $prefix ? $tmp_path : trim(preg_replace('#/+#', ' > ', $resolve_name), ' > '),
+                            'path' => $path,
+                            'slug' => $tmp_path !== $prefix ? $tmp_path_echo : trim(preg_replace('#/+#', '.', $resolve_name), '.'),
+                            'title' => Str::title($tmp_path !== $prefix ? $tmp_path_echo : $nam),
                             'routes' => $tmp_path !== $prefix ? [] : $this->getRoutes($routes, $resolve_name, $prefix)
                         ];
                     }
@@ -197,7 +259,7 @@ class PermissionGroupsController extends Controller
             unset($cur);
         }
 
-        // dd($out['admin']);
+        // dd($out);
 
         // unset($out['admin']['children']);
 
@@ -205,27 +267,6 @@ class PermissionGroupsController extends Controller
             'code' => 20000,
             'data' => $out
         ];
-    }
-    function dirsToTree($dirs)
-    {
-        $tree = [];
-
-        $prevNode = null;
-        foreach ($dirs as $dir) {
-
-            $currNode = trim(preg_replace('#/#', '.', preg_replace('#permissions/api#', '', $dir)), '.');
-            if ($prevNode === null) {
-                $prevNode = $currNode;
-            } else if (!preg_match("#" . $prevNode . "#", $currNode)) {
-                $prevNode = $currNode;
-            }
-
-            if (strlen($currNode) < 1) continue;
-
-            dd($currNode);
-        }
-
-        return $dirs;
     }
 
     public function listRoles()
@@ -279,7 +320,7 @@ class PermissionGroupsController extends Controller
     /**
      * delete permissiongroup
      */
-    public function destroyPermissionGroup($permissiongroup_id)
+    public function destroy($permissiongroup_id)
     {
         $permissiongroup = PermissionGroup::findOrFail($permissiongroup_id);
         if ($permissiongroup->is_default)

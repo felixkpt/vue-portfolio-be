@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\Settings\Permissiongroups\PermissionGroupsController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -13,3 +14,12 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
+Route::get(
+    '/api/test',
+    function () {
+        $new = new PermissionGroupsController();
+
+        $new->listRoutes();
+    }
+);

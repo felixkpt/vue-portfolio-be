@@ -3,9 +3,9 @@
 use Illuminate\Support\Facades\Route;
 
 $controller = \App\Http\Controllers\Api\Admin\Settings\Users\UsersController::class;
-Route::post('/storesamoei', [$controller, 'storeUser']);
 Route::post('/', [$controller, 'storeUser']);
-Route::get('/list/{role?}', [$controller, 'listUsers']);
+Route::post('/store', [$controller, 'storeUser']);
+Route::get('/list/{role?}', [$controller, 'listUsers'])->name('List users roles');
 Route::get('/user/{id}', [$controller, 'getUser']);
 Route::post('/user/status/{id}', [$controller, 'updateStatus']);
 Route::get('/user/{id}/logs', [$controller, 'listUserLogs']);
