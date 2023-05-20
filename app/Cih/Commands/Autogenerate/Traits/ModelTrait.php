@@ -25,7 +25,7 @@ trait ModelTrait
 
 
         if ($prompt_namespace === true) {
-            $subfolder = $this->ask("What is the model subfolder? A to abort", "Core");
+            $subfolder = $this->ask("What is the model subfolder? A to abort", $this->autoGenerateProps->model_folder);
             if (strtolower($subfolder) == 'a') return false;
 
             if ($subfolder) {

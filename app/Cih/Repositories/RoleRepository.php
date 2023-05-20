@@ -47,16 +47,21 @@ class RoleRepository
     public function check()
     {
 
-        if (currentUser()) {
-            $this->authorize();
+        // return true;
+
+        $current = request()->getPathInfo();
+
+        if (Str::startsWith($current, '/api/client')) {
+            return true;
+        }else if (currentUser()) {
+            $this->authorize($current);
         } else {
-            App::abort(403, "Not authorized to access this page/resource/endpoint");
+            App::abort(401, "Not authorized to access this page/resource/endpoint");
         }
     }
 
-    protected function authorize()
+    protected function authorize($current)
     {
-        $current = request()->getPathInfo();
 
         $allowed_urls = [];
         $allowed_urls[] = '/';
@@ -73,7 +78,7 @@ class RoleRepository
 
         $routes = $slugs = $methods = [];
         if (isset($module->routes)) {
-            [$routes, $slugs, $methods] = [json_decode($module->routes) ?? [], json_decode($module->slugs) ?? [], json_decode($module->methods) ?? []];
+            [$routes, $slugs] = [json_decode($module->routes) ?? [], json_decode($module->slugs) ?? [], json_decode($module->methods) ?? []];
         }
 
         $incoming_route = Str::after(Route::getCurrentRoute()->uri, 'api/');

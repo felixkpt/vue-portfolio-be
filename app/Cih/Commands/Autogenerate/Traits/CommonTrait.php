@@ -52,7 +52,8 @@ trait CommonTrait
         $route_index = $this->autoGenerateProps->route_index === 'index' ? 'index' : strtolower($this->autoGenerateProps->default_name);
         $view_index = $this->autoGenerateProps->view_index === 'index' ? 'index' : strtolower($this->autoGenerateProps->default_name);
 
-        $new_content = str_replace('{model}', $model, $content);
+        $new_content = str_replace('{default_name}', strtolower($this->autoGenerateProps->default_name), $content);
+        $new_content = str_replace('{model}', $model, $new_content);
         $new_content = str_replace('{cmodel}', strtoupper($model), $new_content);
         $new_content = str_replace('{title}', $this->autoGenerateProps->view_title, $new_content);
         $new_content = str_replace('{models}', $models, $new_content);

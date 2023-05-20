@@ -13,19 +13,24 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('posts', function (Blueprint $table) {
+        Schema::create('projects', function (Blueprint $table) {
             $table->id();
             $table->string("title");
             $table->string("slug");
-            $table->text("content_short")->nullable();
             $table->longText("content");
+            $table->text("content_short")->nullable();
             $table->string("source_uri")->nullable();
             $table->boolean("comment_disabled")->default(0)->nullable();
-            $table->text("featured_image")->nullable();
+            $table->mediumText("featured_image")->nullable();
             $table->string("status")->default('published')->nullable();
             $table->dateTime("display_time")->nullable();
-            $table->unsignedTinyInteger("importance");
+            $table->unsignedTinyInteger("importance")->default(0);
             $table->unsignedBigInteger("user_id");
+            $table->string("project_url")->nullable();
+            $table->string("github_url")->nullable();
+            $table->unsignedBigInteger("company_id");
+            $table->string("start_date");
+            $table->string("end_date")->nullable();
             $table->timestamps();
         });
     }
@@ -37,6 +42,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('posts');
+        Schema::dropIfExists('projects');
     }
 };

@@ -8,7 +8,7 @@ use ReflectionClass;
 class AutoGenerateProps
 {
     public $model_name;
-    public $model_folder = 'Core';
+    public $model_folder = '';
     public $model_namespace;
     public $fields;
     public $plain_fields;
@@ -21,15 +21,15 @@ class AutoGenerateProps
     public $recently_created_model = false;
     public $path = '';
     public $mutations = [];
-    public $route_folder = 'admin';
-    public $route_folder_init = 'Admin';
-    public $view_folder = 'admin';
-    public $view_folder_init = 'Admin';
+    public $route_folder = '';
+    public $route_folder_init = '';
+    public $view_folder = '';
+    public $view_folder_init = '';
 
     public $controller_name;
     public $controller_folder = 'Http/Controllers';
-    public $controller_subfolder = 'Admin';
-    public $controller_subfolder_init = 'Admin';
+    public $controller_subfolder = '';
+    public $controller_subfolder_init = '';
     public $fully_qualified_class = 'full_controller_path';
     public $namespace = 'the_namespace';
     public $real_controller;

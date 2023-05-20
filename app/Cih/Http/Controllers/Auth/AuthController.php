@@ -164,6 +164,13 @@ class AuthController extends Controller
     public function getUserByToken()
     {
 
+        if (request()->token == 'default') return response([
+            'roles' => ['subscriber'],
+            'permissions' => [],
+            'routes' => [],
+
+        ], 200);
+
         $user = currentUser();
 
         if (!$user) return response([], 401);

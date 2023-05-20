@@ -13,16 +13,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('permission_groups', function (Blueprint $table) {
+        Schema::create('contacts', function (Blueprint $table) {
             $table->id();
-			$table->string('name')->unique();
-			$table->string('slug')->unique();
-			$table->longText('description');
-			$table->json('routes');
-			$table->json('slugs');
-			$table->unsignedBigInteger('user_id');
-			$table->boolean('is_default');
-			$table->boolean('status')->default(1)->nullable();
+            $table->string('type');
+            $table->string('link');
+            $table->mediumText('logo')->nullable();
+            $table->unsignedTinyInteger("importance")->default(0);
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedTinyInteger("status")->default(1);
             $table->timestamps();
         });
     }
@@ -34,6 +32,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('permission_groups');
+        Schema::dropIfExists('contacts');
     }
 };

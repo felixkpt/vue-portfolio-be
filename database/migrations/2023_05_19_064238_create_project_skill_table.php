@@ -13,16 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('permission_groups', function (Blueprint $table) {
+        Schema::create('project_skill', function (Blueprint $table) {
             $table->id();
-			$table->string('name')->unique();
-			$table->string('slug')->unique();
-			$table->longText('description');
-			$table->json('routes');
-			$table->json('slugs');
-			$table->unsignedBigInteger('user_id');
-			$table->boolean('is_default');
-			$table->boolean('status')->default(1)->nullable();
+            $table->unsignedBigInteger('project_id');
+            $table->unsignedBigInteger('skill_id');
+            $table->unsignedTinyInteger('importance')->default(0);
             $table->timestamps();
         });
     }
@@ -34,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('permission_groups');
+        Schema::dropIfExists('project_skill');
     }
 };

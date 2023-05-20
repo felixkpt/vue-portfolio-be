@@ -5,21 +5,22 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Post extends Model
+class Skill extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        "title",
-        "slug",
-        "content",
-        "content_short",
-        "source_uri",
-        "comment_disabled",
-        "featured_image",
-        "status",
-        "display_time",
+        "name",
+        "start_date",
+        "level",
+        "category",
+        "logo",
         "importance",
         "user_id"
     ];
+
+    function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
