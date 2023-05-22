@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Api\Client\Companies;
+namespace App\Http\Controllers\Api\Client\SkillsCategories;
 
 use App\Http\Controllers\Controller;
 
 use App\Http\Traits\ControllerTrait;
-use App\Models\Company;
+use App\Models\SkillsCategory;
 
-class CompaniesController extends Controller
+class SkillsCategoriesController extends Controller
 {
 
     /**
@@ -20,19 +20,13 @@ class CompaniesController extends Controller
      */
     public function index()
     {
-        $items = Company::wherestatus(1);
-
-        if (request()->all)
-            return $items->get();
-
-        $items = $items->paginate();
-
+        $items = SkillsCategory::wherestatus(1)->with('user')->paginate();
         return response(['message' => 'success', 'data' => $items]);
     }
 
     function show($id)
     {
-        $item = Company::wherestatus(1)->whereid($id)->first();
+        $item = SkillsCategory::wherestatus(1)->whereid($id)->first();
         return response(['type' => 'success', 'message' => 'successfully', 'data' => $item], 200);
     }
 }

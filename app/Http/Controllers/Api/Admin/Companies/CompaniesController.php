@@ -82,7 +82,7 @@ class CompaniesController extends Controller
     /**
      * toggle company status
      */
-    public function toggleStatus($id)
+    public function changeStatus($id)
     {
         $company = Company::findOrFail($id);
         $state = $company->status == 1 ? 'Deactivated' : 'Activated';

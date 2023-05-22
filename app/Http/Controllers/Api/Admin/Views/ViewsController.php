@@ -61,7 +61,7 @@ class ViewsController extends Controller
     /**
      * toggle cow status
      */
-    public function toggleStatus($id)
+    public function changeStatus($id)
     {
         $cow = Cow::findOrFail($id);        
         $state = $cow->status == 1 ? 'Deactivated' : 'Activated';

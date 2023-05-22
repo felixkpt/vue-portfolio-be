@@ -5,16 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Skill extends Model
+class SkillsCategory extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         "name",
-        "start_date",
-        "level",
-        "skill_category_id",
-        "logo",
         "importance",
         "user_id"
     ];
@@ -22,9 +18,5 @@ class Skill extends Model
     function user()
     {
         return $this->belongsTo(User::class);
-    }
-    function skillCategory()
-    {
-        return $this->belongsTo(SkillsCategory::class);
     }
 }

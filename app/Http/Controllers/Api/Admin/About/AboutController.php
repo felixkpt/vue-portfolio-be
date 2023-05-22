@@ -74,7 +74,7 @@ class AboutController extends Controller
     /**
      * toggle company status
      */
-    public function toggleStatus($id)
+    public function changeStatus($id)
     {
         $company = About::findOrFail($id);
         $state = $company->status == 1 ? 'Deactivated' : 'Activated';

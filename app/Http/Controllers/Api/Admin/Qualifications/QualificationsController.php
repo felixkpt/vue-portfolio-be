@@ -75,7 +75,7 @@ class QualificationsController extends Controller
     /**
      * toggle qualifications status
      */
-    public function toggleStatus($id)
+    public function changeStatus($id)
     {
         $qualification = Qualification::findOrFail($id);
         $state = $qualification->status == 1 ? 'Deactivated' : 'Activated';

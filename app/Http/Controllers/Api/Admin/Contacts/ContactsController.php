@@ -69,7 +69,7 @@ class ContactsController extends Controller
     /**
      * toggle contacts status
      */
-    public function toggleStatus($id)
+    public function changeStatus($id)
     {
         $contact = Contact::findOrFail($id);
         $state = $contact->status == 1 ? 'Deactivated' : 'Activated';

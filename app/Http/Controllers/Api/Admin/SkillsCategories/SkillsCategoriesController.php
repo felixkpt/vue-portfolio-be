@@ -1,16 +1,15 @@
 <?php
 
-namespace App\Http\Controllers\Api\Admin\Skills;
+namespace App\Http\Controllers\Api\Admin\SkillsCategories;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Schema;
 use App\Http\Traits\ControllerTrait;
-use App\Models\Skill;
+use App\Models\SkillsCategory;
 use Carbon\Carbon;
 
-class SkillsController extends Controller
+class SkillsCategoriesController extends Controller
 {
 
     /**
@@ -24,9 +23,9 @@ class SkillsController extends Controller
     public function index()
     {
         if (request()->all == 1)
-        return Skill::where('status', 1)->get();
+        return SkillsCategory::where('status', 1)->get();
 
-        $skills = Skill::with(['user', 'skillCategory'])->paginate();
+        $skills = SkillsCategory::with('user')->paginate();
 
         return response(['message' => 'success', 'data' => $skills]);
     }
@@ -38,18 +37,13 @@ class SkillsController extends Controller
     {
 
         request()->validate([
-            'name' => 'required|unique:skills,name,' . request()->id . ',id',
-            'start_date' => 'required|date',
-            'level' => 'required|string',
-            'skill_category_id' => 'required|numeric'
+            'name' => 'required|unique:skills_categories,name,' . request()->id . ',id',
         ]);
 
         $data = \request()->all();
 
-        $data['start_date'] = Carbon::parse(request()->start_date)->format('Y-m');
-
         if (!isset($data['user_id'])) {
-            if (Schema::hasColumn('skills', 'user_id'))
+            if (Schema::hasColumn('skills_categories', 'user_id'))
                 $data['user_id'] = currentUser()->id;
         }
 
@@ -59,8 +53,8 @@ class SkillsController extends Controller
             $action = "saved";
         }
 
-        $res = Skill::updateOrCreate(['id' => request()->id], $data);
-        return response(['type' => 'success', 'message' => 'Skill ' . $action . ' successfully', 'data' => $res], 201);
+        $res = SkillsCategory::updateOrCreate(['id' => request()->id], $data);
+        return response(['type' => 'success', 'message' => 'SkillsCategory ' . $action . ' successfully', 'data' => $res], 201);
     }
 
     public function update()
@@ -71,7 +65,7 @@ class SkillsController extends Controller
     function show($id)
     {
 
-        $res = Skill::find($id);
+        $res = SkillsCategory::find($id);
         return response(['type' => 'success', 'message' => 'successfully', 'data' => $res], 200);
     }
     /**
@@ -79,20 +73,20 @@ class SkillsController extends Controller
      */
     public function changeStatus($id)
     {
-        $skill = Skill::findOrFail($id);
+        $skill = SkillsCategory::findOrFail($id);
         $state = $skill->status == 1 ? 'Deactivated' : 'Activated';
         $skill->status = $skill->status == 1 ? 0 : 1;
         $skill->save();
-        return response(['type' => 'success', 'message' => 'Skill #' . $skill->id . ' has been ' . $state]);
+        return response(['type' => 'success', 'message' => 'SkillsCategory #' . $skill->id . ' has been ' . $state]);
     }
 
     /**
      * delete skills
      */
-    public function destroySkill($id)
+    public function destroySkillsCategory($id)
     {
-        $skill = Skill::findOrFail($id);
+        $skill = SkillsCategory::findOrFail($id);
         $skill->delete();
-        return redirect()->back()->with('notice', ['type' => 'success', 'message' => 'Skill deleted successfully']);
+        return redirect()->back()->with('notice', ['type' => 'success', 'message' => 'SkillsCategory deleted successfully']);
     }
 }
