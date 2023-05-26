@@ -24,7 +24,7 @@ class ProjectsController extends Controller
     public function index()
     {
         if (request()->all == 1)
-        return Project::where('status', 1)->get();
+        return Project::where('status', 1)->orWhereNull('status')->get();
         
         $projects = Project::with(['company', 'skills'])->paginate();
 
@@ -38,7 +38,7 @@ class ProjectsController extends Controller
     {
 
         request()->validate([
-            'title' => 'required|unique:projects,title,' . request()->id . ',id',
+            'title' => 'required|unique:projects,title,' . request()->id . ',_id',
             'company_id' => 'required',
             'start_date' => 'required|date',
             'end_date' => 'required|date',
@@ -71,9 +71,10 @@ class ProjectsController extends Controller
             $action = "updated";
         } else {
             $action = "saved";
+            $data['status'] = 'published';
         }
 
-        $res = Project::updateOrCreate(['id' => request()->id], $data);
+        $res = Project::updateOrCreate(['_id' => request()->id ?? str()->random(20)], $data);
 
         if (isset($data['skills']))
             $res->skills()->sync($data['skills']);

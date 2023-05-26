@@ -7,7 +7,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Schema;
 use App\Http\Traits\ControllerTrait;
 use App\Models\Contact;
-use Carbon\Carbon;
 
 class ContactsController extends Controller
 {
@@ -34,7 +33,7 @@ class ContactsController extends Controller
     {
 
         request()->validate([
-            'type' => 'required|unique:contacts,type,' . request()->id . ',id',
+            'type' => 'required|unique:contacts,type,' . request()->id . ',_id',
             'link' => 'required',
         ]);
 
@@ -49,9 +48,10 @@ class ContactsController extends Controller
             $action = "updated";
         } else {
             $action = "saved";
+            $data['status'] = 1;
         }
 
-        $res = Contact::updateOrCreate(['id' => request()->id], $data);
+        $res = Contact::updateOrCreate(['_id' => request()->id ?? str()->random(20)], $data);
         return response(['type' => 'success', 'message' => 'Contact ' . $action . ' successfully', 'data' => $res], 201);
     }
 

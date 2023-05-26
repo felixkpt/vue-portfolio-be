@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Jenssegers\Mongodb\Eloquent\Model;
 
 class Skill extends Model
 {
@@ -13,10 +13,11 @@ class Skill extends Model
         "name",
         "start_date",
         "level",
-        "skill_category_id",
+        "skills_category_id",
         "logo",
         "importance",
-        "user_id"
+        "user_id",
+        "status",
     ];
 
     function user()
@@ -25,6 +26,6 @@ class Skill extends Model
     }
     function skillCategory()
     {
-        return $this->belongsTo(SkillsCategory::class);
+        return $this->belongsTo(SkillsCategory::class, 'skills_category_id');
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
+use Jenssegers\Mongodb\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             //
             $table->integer('permission_group_id')->nullable();
-            $table->enum('role', ['admin', 'member'])->default('member');
+            $table->enum('role', ['admin', 'member', 'client'])->default('member');
             $table->string('phone')->nullable();
             $table->string('avatar')->default('images/users/default.png');
         });

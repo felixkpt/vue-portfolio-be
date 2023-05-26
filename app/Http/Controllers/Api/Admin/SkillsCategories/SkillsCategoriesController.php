@@ -23,7 +23,7 @@ class SkillsCategoriesController extends Controller
     public function index()
     {
         if (request()->all == 1)
-        return SkillsCategory::where('status', 1)->get();
+            return SkillsCategory::where('status', 1)->orWhereNull('status')->get();
 
         $skills = SkillsCategory::with('user')->paginate();
 
@@ -37,7 +37,7 @@ class SkillsCategoriesController extends Controller
     {
 
         request()->validate([
-            'name' => 'required|unique:skills_categories,name,' . request()->id . ',id',
+            'name' => 'required|unique:skills_categories,name,' . request()->id . ',_id',
         ]);
 
         $data = \request()->all();
@@ -51,9 +51,11 @@ class SkillsCategoriesController extends Controller
             $action = "updated";
         } else {
             $action = "saved";
+            $data['status'] = 1;
         }
 
-        $res = SkillsCategory::updateOrCreate(['id' => request()->id], $data);
+        $res = SkillsCategory::updateOrCreate(['_id' => request()->id ?? str()->random(20)], $data);
+        $res->touch();
         return response(['type' => 'success', 'message' => 'SkillsCategory ' . $action . ' successfully', 'data' => $res], 201);
     }
 

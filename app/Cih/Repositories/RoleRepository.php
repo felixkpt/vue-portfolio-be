@@ -9,10 +9,9 @@
 
 namespace App\Cih\Repositories;
 
-use App\Models\Core\PermissionGroup;
+use App\Models\PermissionGroup;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 
 use Illuminate\Support\Str;
@@ -73,13 +72,15 @@ class RoleRepository
             return true;
         }
 
-        $module = PermissionGroup::where('id', $this->user->permission_group_id)
+        $module = PermissionGroup::find($this->user->permission_group_id)
             ->first();
 
-        $routes = $slugs = $methods = [];
+        $routes = $slugs = [];
         if (isset($module->routes)) {
-            [$routes, $slugs] = [json_decode($module->routes) ?? [], json_decode($module->slugs) ?? [], json_decode($module->methods) ?? []];
+            [$routes, $slugs] = [$module->routes ?? [], $module->slugs ?? []];
         }
+        
+        if ($routes[0] == '*') return true;
 
         $incoming_route = Str::after(Route::getCurrentRoute()->uri, 'api/');
         $method = request()->method();

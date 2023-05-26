@@ -3,26 +3,14 @@
 namespace App\Cih\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\Core\AgentListing;
-use App\Models\Core\Company;
-use App\Models\Core\DepartmentPermission;
-use App\Models\Core\HouseRequest;
-use App\Models\Core\InterestedRequest;
-use App\Models\Core\Property;
-use App\Models\Core\RequiredDocument;
-use App\Models\Core\UploadedDocument;
 use App\Models\User;
-use App\Notifications\InviteMember;
-use App\Notifications\SendSms;
-use App\Notifications\verifyPhone;
-use App\Cih\Repositories\RoleRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 use App\Cih\Repositories\ShRepository;
-use App\Models\Core\Permission;
+use App\Models\PermissionGroup;
 
 class AuthController extends Controller
 {
@@ -126,6 +114,7 @@ class AuthController extends Controller
     }
     public function register()
     {
+        // User::where([])->delete();
         $rules = [
             'email' => 'required|unique:users',
             'name' => 'required',
@@ -140,19 +129,47 @@ class AuthController extends Controller
                 'errors' => $valid->errors()
             ], 422);
         }
+
         $email = \request('email');
         $password = \request('password');
         $name = \request('name');
         $phone = \request('phone');
         $role = 'client';
+        $avatar = 'images/users/default.png';
+
         $user = User::create([
             'name' => $name,
             'email' => $email,
             'phone' => $phone,
             'role' => $role,
-            'password' => Hash::make($password)
+            'password' => Hash::make($password),
+            'avatar' => $avatar
         ]);
+
         $token = $user->createToken('api_token_at_' . now()->toDateTimeString());
+
+        if (User::count() == 1) {
+
+            $user->role = 'admin';
+
+            $permission_group = PermissionGroup::where([])->first();
+            if (!$permission_group) {
+                $permission_group = PermissionGroup::create([
+                    'name' => 'Admin',
+                    'slug' => 'admin',
+                    'description' => 'Admin, also known as a web administrator or webmaster, individual or a team responsible for managing and maintaining the website. Admin ensures the smooth operation and functionality of the website, as well as to monitor and manage its content, security, and performance.',
+                    'routes' => ['*'],
+                    'slugs' => ['*'],
+                    'is_default' => 1
+                ]);
+            }
+
+            $user->permission_group_id = $permission_group->id;
+            $user->save();
+        }
+
+        // dd(4567);
+
         ShRepository::storeLog('user_registration', "$user->role  <a target='_blank' href='/admin/users/user/$user->id'> $user->name</a> registered", $user);
         return [
             'status' => 'success',
@@ -175,13 +192,14 @@ class AuthController extends Controller
 
         if (!$user) return response([], 401);
 
+        // $user = User::with('permissions')->find($user->id)->first();
         $user->roles = [$user->role];
 
+        $user->permissions = PermissionGroup::find($user->permission_group_id);
+
         if ($user->permissions) {
-            $permissions = json_decode($user->permissions->permissions);
             $routes = json_decode($user->permissions->routes);
-            $user->permissions = $permissions;
-            $user->routes = array_values(array_unique(array_map(fn($route) => preg_split('#@#', $route, 2)[0], $routes)));
+            $user->routes = array_values(array_unique(array_map(fn ($route) => preg_split('#@#', $route, 2)[0], $routes)));
         }
 
         $user->avatar = asset($user->avatar);

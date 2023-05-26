@@ -13,22 +13,25 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::group(['middleware' => ['api'], 'prefix' => 'api'], function () {
-    require app_path('Cih/routes/auth/unauthenticated.php');
-});
+
+Route::middleware('api')
+    ->prefix('api')
+    ->group(app_path('Cih/routes/auth/unauthenticated.php'));
 
 
 $middleWares = ['api', 'sh_auth'];
 
-Route::group(['middleware' => $middleWares, 'prefix' => 'api'], function () {
-    
+Route::middleware($middleWares)
+    ->prefix('api')
+    ->group(function () {
+
     require app_path('Cih/routes/auth/authenticated.php');
-    
+
     $routes_path = base_path('routes/api');
     if (file_exists($routes_path)) {
         $route_files = File::allFiles(base_path('routes/api'));
         foreach ($route_files as $file) {
-            
+
             $path = $file->getPath();
             $file_name = $file->getFileName();
             $prefix = str_replace($file_name, '', $path);

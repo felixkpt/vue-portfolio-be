@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
+use Jenssegers\Mongodb\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('qualification');
             $table->string('start_date');
             $table->string('end_date');
+            $table->mediumText('featured_image')->nullable();
             $table->unsignedTinyInteger("importance")->default(0);
             $table->unsignedBigInteger('user_id');
             $table->unsignedTinyInteger("status")->default(1);

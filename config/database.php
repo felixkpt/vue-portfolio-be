@@ -54,7 +54,7 @@ return [
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',
-            'prefix' => 'test_',
+            'prefix' => '',
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
@@ -91,6 +91,12 @@ return [
             'prefix_indexes' => true,
             // 'encrypt' => env('DB_ENCRYPT', 'yes'),
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
+        ],
+
+        'mongodb' => [
+            'driver' => 'mongodb',
+            'dsn' => env('DB_URI', 'mongodb+srv://portfolio:UNotxZHgpAJ0pbnT@cluster0.q3bev.mongodb.net/?retryWrites=true&w=majority'),
+            'database' => 'portfolio',
         ],
 
     ],

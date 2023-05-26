@@ -79,7 +79,7 @@ class PermissionGroupsController extends Controller
                 $data['is_default'] = true;
         }
 
-        $res = PermissionGroup::updateOrCreate(['id' => request()->id], $data);
+        $res = PermissionGroup::updateOrCreate(['_id' => request()->id ?? str()->random(20)], $data);
         return response(['type' => 'success', 'message' => 'PermissionGroup ' . $action . ' successfully', 'data' => $res]);
     }
 

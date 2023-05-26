@@ -24,7 +24,7 @@ class SkillsController extends Controller
     public function index()
     {
         if (request()->all == 1)
-        return Skill::where('status', 1)->get();
+        return Skill::where('status', 1)->orWhereNull('status')->get();
 
         $skills = Skill::with(['user', 'skillCategory'])->paginate();
 
@@ -38,10 +38,10 @@ class SkillsController extends Controller
     {
 
         request()->validate([
-            'name' => 'required|unique:skills,name,' . request()->id . ',id',
+            'name' => 'required|unique:skills,name,' . request()->id . ',_id',
             'start_date' => 'required|date',
             'level' => 'required|string',
-            'skill_category_id' => 'required|numeric'
+            'skills_category_id' => 'required|string'
         ]);
 
         $data = \request()->all();
@@ -57,9 +57,10 @@ class SkillsController extends Controller
             $action = "updated";
         } else {
             $action = "saved";
+            $data['status'] = 1;
         }
 
-        $res = Skill::updateOrCreate(['id' => request()->id], $data);
+        $res = Skill::updateOrCreate(['_id' => request()->id ?? str()->random(20)], $data);
         return response(['type' => 'success', 'message' => 'Skill ' . $action . ' successfully', 'data' => $res], 201);
     }
 

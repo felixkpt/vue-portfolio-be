@@ -26,7 +26,7 @@ class CompaniesController extends Controller
     public function index()
     {
         if (request()->all == 1)
-            return Company::where('status', 1)->get();
+            return Company::where('status', 1)->orWhereNull('status')->get();
 
         $company = Company::with('user')->paginate();
 
@@ -67,9 +67,10 @@ class CompaniesController extends Controller
             $action = "updated";
         } else {
             $action = "saved";
+            $data['status'] = 1;
         }
 
-        Company::updateOrCreate(['id' => request()->id], $data);
+        Company::updateOrCreate(['_id' => request()->id ?? str()->random(20)], $data);
 
         return response(['type' => 'success', 'message' => 'Company ' . $action . ' successfully']);
     }

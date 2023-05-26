@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\User;
+
 function autoForm()
 {
 }
@@ -10,9 +12,10 @@ function currentUser()
 
     if (!$user) {
         // Fetch the associated token Model
-        $token = \Laravel\Sanctum\PersonalAccessToken::findToken(request()->bearerToken() ?? request()->token);
+        $token = App\Models\Sanctum\PersonalAccessToken::findToken(request()->bearerToken() ?? request()->token);
+        
         // Get the assigned user
-        $user = $token->tokenable ?? null;
+        $user = $token ? User::find($token->tokenable)->first() : null;
     }
 
     return $user;

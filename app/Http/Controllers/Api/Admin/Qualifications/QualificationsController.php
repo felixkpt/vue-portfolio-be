@@ -34,7 +34,7 @@ class QualificationsController extends Controller
     {
 
         request()->validate([
-            'institution' => 'required|unique:qualifications,institution,' . request()->id . ',id',
+            'institution' => 'required|unique:qualifications,institution,' . request()->id . ',_id',
             'course' => 'required',
             'qualification' => 'required',
             'start_date' => 'required|date',
@@ -55,9 +55,10 @@ class QualificationsController extends Controller
             $action = "updated";
         } else {
             $action = "saved";
+            $data['status'] = 1;
         }
 
-        $res = Qualification::updateOrCreate(['id' => request()->id], $data);
+        $res = Qualification::updateOrCreate(['_id' => request()->id ?? str()->random(20)], $data);
         return response(['type' => 'success', 'message' => 'Qualification ' . $action . ' successfully', 'data' => $res], 201);
     }
 

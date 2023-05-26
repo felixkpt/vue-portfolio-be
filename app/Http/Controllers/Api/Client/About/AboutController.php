@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 
 use App\Models\About;
 use App\Http\Traits\ControllerTrait;
-use Carbon\Carbon;
 
 class AboutController extends Controller
 {

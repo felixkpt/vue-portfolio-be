@@ -32,7 +32,7 @@ class ProjectsController extends Controller
 
     function show($id)
     {
-        $item = Project::wherestatus(1)->whereid($id)->first();
+        $item = Project::wherestatus('published')->whereslug($id)->firstOrFail();
         return response(['type' => 'success', 'message' => 'successfully', 'data' => $item], 200);
     }
 }

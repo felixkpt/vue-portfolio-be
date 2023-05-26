@@ -37,7 +37,7 @@ class PostsController extends Controller
     {
 
         request()->validate([
-            'title' => 'required|unique:posts,title,' . request()->id . ',id'
+            'title' => 'required|unique:posts,title,' . request()->id . ',_id'
         ]);
 
         $data = \request()->all();
@@ -56,9 +56,10 @@ class PostsController extends Controller
             $action = "updated";
         } else {
             $action = "saved";
+            $data['status'] = 'published';
         }
 
-        $res = Post::updateOrCreate(['id' => request()->id], $data);
+        $res = Post::updateOrCreate(['_id' => request()->id ?? str()->random(20)], $data);
         return response(['type' => 'success', 'message' => 'Post ' . $action . ' successfully', 'data' => $res], 201);
     }
 
@@ -70,7 +71,7 @@ class PostsController extends Controller
         $posts = Post::where([]);
 
         if (\request('all')) {
-            if (Schema::hasColumn('posts', 'status')) return $posts->where('status', 1)->get();
+            if (Schema::hasColumn('posts', 'status')) return $posts->where('status', 1)->orWhereNull('status')->get();
             else return $posts->get();
         }
 

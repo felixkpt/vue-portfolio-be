@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Jenssegers\Mongodb\Eloquent\Model;
 
 class Contact extends Model
 {
@@ -15,6 +15,7 @@ class Contact extends Model
         'logo',
         'importance',
         'user_id',
+        "status",
     ];
     
     function user()

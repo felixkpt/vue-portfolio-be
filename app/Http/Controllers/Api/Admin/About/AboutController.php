@@ -23,7 +23,7 @@ class AboutController extends Controller
     public function index()
     {
         if (request()->all == 1)
-            return About::where('status', 1)->get();
+            return About::where('status', 1)->orWhereNull('status')->get();
 
         $company = About::with('user')->paginate();
 
@@ -37,14 +37,15 @@ class AboutController extends Controller
     {
         // dd(request()->all());
         request()->validate([
-            'title' => 'required|unique:about,title,' . request()->id,
+            'salutation' => 'nullable|string',
+            'name' => 'required|unique:about,name,' . request()->id.',_id',
             'content' => 'required|',
             'content_short' => 'required|string',
         ]);
 
         $data = \request()->all();
 
-        $data['slug'] = Str::slug($data['title']);
+        $data['slug'] = Str::slug($data['name']);
         if (!isset($data['user_id'])) {
             if (Schema::hasColumn('companies', 'user_id'))
                 $data['user_id'] = currentUser()->id;
@@ -54,9 +55,10 @@ class AboutController extends Controller
             $action = "updated";
         } else {
             $action = "saved";
+            $data['status'] = 'published';
         }
 
-        About::updateOrCreate(['id' => request()->id], $data);
+        About::updateOrCreate(['_id' => request()->id ?? str()->random(20)], $data);
 
         return response(['type' => 'success', 'message' => 'About ' . $action . ' successfully']);
     }

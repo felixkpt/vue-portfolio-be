@@ -51,7 +51,7 @@ class ViewsController extends Controller
         $cows = Cow::where([]);
 
         if(\request('all')) {
-            if (Schema::hasColumn('cows', 'status')) return $cows->where('status', 1)->get();
+            if (Schema::hasColumn('cows', 'status')) return $cows->where('status', 1)->orWhereNull('status')->get();
             else return $cows->get();
         }
         

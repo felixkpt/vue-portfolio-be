@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Jenssegers\Mongodb\Eloquent\Model;
 
 class About extends Model
 {
@@ -12,13 +12,15 @@ class About extends Model
     protected $table = 'about';
     
     protected $fillable = [
-        "title",
+        "salutation",
+        "name",
         "slug",
         "slogan",
         "content",
         "content_short",
         "featured_image",
         "user_id",
+        "status",
     ];
 
     function user()

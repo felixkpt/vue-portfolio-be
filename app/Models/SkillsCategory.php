@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Jenssegers\Mongodb\Eloquent\Model;
 
 class SkillsCategory extends Model
 {
@@ -11,12 +11,19 @@ class SkillsCategory extends Model
 
     protected $fillable = [
         "name",
+        "featured_image",
         "importance",
-        "user_id"
+        "user_id",
+        "status"
     ];
 
     function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    function skills()
+    {
+        return $this->hasMany(Skill::class);
     }
 }

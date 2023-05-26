@@ -48,6 +48,5 @@ class CihServiceProvider extends ServiceProvider
         $router = $this->app->make(Router::class);
         $router->aliasMiddleware('sh_auth', ShAuth::class);
         $this->loadRoutesFrom(base_path('app/Cih/routes/driver.php'));
-        $this->loadMigrationsFrom(base_path('app/Cih/App/Migrations'));
     }
 }
