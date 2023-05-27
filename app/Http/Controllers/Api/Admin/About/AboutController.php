@@ -18,20 +18,20 @@ class AboutController extends Controller
     use ControllerTrait;
 
     /**
-     * return company's index view
+     * return about's index view
      */
     public function index()
     {
         if (request()->all == 1)
             return About::where('status', 1)->orWhereNull('status')->get();
 
-        $company = About::with('user')->paginate();
+        $about = About::with('user')->paginate();
 
-        return response(['message' => 'success', 'data' => $company]);
+        return response(['message' => 'success', 'data' => $about]);
     }
 
     /**
-     * store company
+     * store about
      */
     public function store()
     {
@@ -73,25 +73,26 @@ class AboutController extends Controller
         $item = About::wherestatus(1)->whereid($id)->first();
         return response(['type' => 'success', 'message' => 'successfully', 'data' => $item], 200);
     }
+
     /**
-     * toggle company status
+     * change about status
      */
     public function changeStatus($id)
     {
-        $company = About::findOrFail($id);
-        $state = $company->status == 1 ? 'Deactivated' : 'Activated';
-        $company->status = $company->status == 1 ? 0 : 1;
-        $company->save();
-        return response(['type' => 'success', 'message' => 'About #' . $company->id . ' has been ' . $state]);
+        $about = About::findOrFail($id);
+        $state = $about->status == 'published' ? 'Deactivated' : 'Activated';
+        $about->status = $about->status == 'published' ? 'draft' : 'published';
+        $about->save();
+        return response(['type' => 'success', 'message' => 'About #' . $about->id . ' has been ' . $state]);
     }
 
     /**
-     * delete company
+     * delete about
      */
     public function destroy($id)
     {
-        $company = About::findOrFail($id);
-        $company->delete();
+        $about = About::findOrFail($id);
+        $about->delete();
         return redirect()->back()->with('notice', ['type' => 'success', 'message' => 'About deleted successfully']);
     }
 }

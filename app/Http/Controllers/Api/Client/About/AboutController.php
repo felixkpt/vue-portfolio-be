@@ -21,7 +21,7 @@ class AboutController extends Controller
     public function index()
     {
         if (request()->all == 1)
-            return About::where('status', 1)->get();
+            return About::where('status', 'published')->get();
 
         $company = About::with('user')->paginate();
 

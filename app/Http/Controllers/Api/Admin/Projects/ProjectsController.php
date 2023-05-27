@@ -24,8 +24,8 @@ class ProjectsController extends Controller
     public function index()
     {
         if (request()->all == 1)
-        return Project::where('status', 1)->orWhereNull('status')->get();
-        
+            return Project::where('status', 1)->orWhereNull('status')->get();
+
         $projects = Project::with(['company', 'skills'])->paginate();
 
         return response(['message' => 'success', 'data' => $projects]);
@@ -79,7 +79,14 @@ class ProjectsController extends Controller
         if (isset($data['skills']))
             $res->skills()->sync($data['skills']);
 
-        return response(['type' => 'success', 'message' => 'Project ' . $action . ' successfully'], 201);
+        $res = Project::find($res->_id)->with(['company', 'skills'])->first();
+
+        return response(['type' => 'success', 'message' => 'Project ' . $action . ' successfully', 'data' => $res], 201);
+    }
+
+    function update()
+    {
+        return $this->store();
     }
 
     function show($id)
@@ -94,8 +101,8 @@ class ProjectsController extends Controller
     public function toggleProjectStatus($portfolio_id)
     {
         $portfolio = Project::findOrFail($portfolio_id);
-        $state = $portfolio->status == 1 ? 'Deactivated' : 'Activated';
-        $portfolio->status = $portfolio->status == 1 ? 0 : 1;
+        $state = $portfolio->status == 'published' ? 'Deactivated' : 'Activated';
+        $portfolio->status = $portfolio->status == 'published' ? 'draft' : 'published';
         $portfolio->save();
         return redirect()->back()->with('notice', ['type' => 'success', 'message' => 'Project #' . $portfolio->id . ' has been ' . $state]);
     }

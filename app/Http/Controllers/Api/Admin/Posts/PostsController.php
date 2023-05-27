@@ -43,7 +43,7 @@ class PostsController extends Controller
         $data = \request()->all();
 
         if (request()->display_time)
-        $data['display_time'] = Carbon::parse(request()->display_time)->format('Y-m-d H:i:s');
+            $data['display_time'] = Carbon::parse(request()->display_time)->format('Y-m-d H:i:s');
 
         $data['slug'] = Str::slug($data['title']);
 
@@ -85,22 +85,23 @@ class PostsController extends Controller
             })->make();
     }
 
-    function show($id) {
+    function show($id)
+    {
 
         $res = Post::find($id);
         return response(['type' => 'success', 'message' => 'successfully', 'data' => $res], 200);
-        
     }
+
     /**
-     * toggle post status
+     * change post status
      */
-    public function togglePostStatus($post_id)
+    public function changeStatus($id)
     {
-        $post = Post::findOrFail($post_id);
-        $state = $post->status == 1 ? 'Deactivated' : 'Activated';
-        $post->status = $post->status == 1 ? 0 : 1;
+        $post = Post::findOrFail($id);
+        $state = $post->status == 'published' ? 'Deactivated' : 'Activated';
+        $post->status = $post->status == 'published' ? 'draft' : 'published';
         $post->save();
-        return redirect()->back()->with('notice', ['type' => 'success', 'message' => 'Post #' . $post->id . ' has been ' . $state]);
+        return response(['type' => 'success', 'message' => 'About #' . $post->id . ' has been ' . $state]);
     }
 
     /**
