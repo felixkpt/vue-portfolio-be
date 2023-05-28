@@ -96,7 +96,7 @@ return [
         'mongodb' => [
             'driver' => 'mongodb',
             'dsn' => env('DB_URI', 'mongodb+srv://portfolio:UNotxZHgpAJ0pbnT@cluster0.q3bev.mongodb.net/?retryWrites=true&w=majority'),
-            'database' => 'portfolio',
+            'database' => 'portfolio3',
         ],
 
     ],

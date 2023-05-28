@@ -158,8 +158,8 @@ class AuthController extends Controller
                     'name' => 'Admin',
                     'slug' => 'admin',
                     'description' => 'Admin, also known as a web administrator or webmaster, individual or a team responsible for managing and maintaining the website. Admin ensures the smooth operation and functionality of the website, as well as to monitor and manage its content, security, and performance.',
-                    'routes' => ['*'],
-                    'slugs' => ['*'],
+                    'routes' => json_encode(['*']),
+                    'slugs' => json_encode(['*']),
                     'is_default' => 1
                 ]);
             }

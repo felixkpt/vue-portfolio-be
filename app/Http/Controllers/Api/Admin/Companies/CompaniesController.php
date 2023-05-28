@@ -40,10 +40,9 @@ class CompaniesController extends Controller
     {
         if (request()->id && !$is_update) abort(403);
 
-
         request()->validate([
-            'name' => 'required|unique:companies,name,' . request()->id,
-            'url' => 'required|url|unique:companies,url,' . request()->id,
+            'name' => 'required|unique:companies,name,' . request()->id . ',_id',
+            'url' => 'required|url|unique:companies,url,' . request()->id . ',_id',
             'logo' => 'required|string',
             'position' => 'required|string',
             'roles' => 'required|string',

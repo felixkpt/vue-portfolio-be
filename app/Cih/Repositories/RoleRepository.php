@@ -52,7 +52,7 @@ class RoleRepository
 
         if (Str::startsWith($current, '/api/client')) {
             return true;
-        }else if (currentUser()) {
+        } else if (currentUser()) {
             $this->authorize($current);
         } else {
             App::abort(401, "Not authorized to access this page/resource/endpoint");
@@ -77,10 +77,9 @@ class RoleRepository
 
         $routes = $slugs = [];
         if (isset($module->routes)) {
-            [$routes, $slugs] = [$module->routes ?? [], $module->slugs ?? []];
+            [$routes, $slugs] = [json_decode($module->routes) ?? [], json_decode($module->slugs) ?? []];
+            if ($routes[0] == '*') return true;
         }
-        
-        if ($routes[0] == '*') return true;
 
         $incoming_route = Str::after(Route::getCurrentRoute()->uri, 'api/');
         $method = request()->method();

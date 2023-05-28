@@ -24,7 +24,7 @@ class ProjectsController extends Controller
     public function index()
     {
         if (request()->all == 1)
-            return Project::where('status', 1)->orWhereNull('status')->get();
+            return Project::where('status', 'published')->orWhereNull('status')->get();
 
         $projects = Project::with(['company', 'skills'])->paginate();
 
@@ -34,8 +34,10 @@ class ProjectsController extends Controller
     /**
      * store portfolio
      */
-    public function store()
+    public function store($is_update = false)
     {
+
+        if (request()->id && !$is_update) abort(403);
 
         request()->validate([
             'title' => 'required|unique:projects,title,' . request()->id . ',_id',
@@ -86,9 +88,8 @@ class ProjectsController extends Controller
 
     function update()
     {
-        return $this->store();
+        return $this->store(true);
     }
-
     function show($id)
     {
 

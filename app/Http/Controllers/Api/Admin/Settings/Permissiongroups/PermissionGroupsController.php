@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\Admin\Settings\Permissiongroups;
 use App\Http\Controllers\Controller;
 
 use Illuminate\Support\Str;
-use App\Models\Core\PermissionGroup;
+use App\Models\PermissionGroup;
 use Illuminate\Support\Facades\Schema;
 use App\Http\Traits\ControllerTrait;
 use App\Models\User;

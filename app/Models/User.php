@@ -24,6 +24,9 @@ class User extends Eloquent implements AuthenticatableContract, AuthorizableCont
         'name',
         'email',
         'password',
+        'phone',
+        'role',
+        'avatar',
     ];
 
     /**
