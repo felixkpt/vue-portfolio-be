@@ -59,7 +59,7 @@ class QualificationsController extends Controller
         }
 
         $res = Qualification::updateOrCreate(['_id' => request()->id ?? str()->random(20)], $data);
-        return response(['type' => 'success', 'message' => 'Qualification ' . $action . ' successfully', 'data' => $res], 201);
+        return response(['type' => 'success', 'message' => 'Qualification ' . $action . ' successfully', 'data' => $res], $action == 'saved' ? 201 : 200);
     }
 
     public function update()

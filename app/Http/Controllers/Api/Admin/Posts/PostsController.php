@@ -60,7 +60,7 @@ class PostsController extends Controller
         }
 
         $res = Post::updateOrCreate(['_id' => request()->id ?? str()->random(20)], $data);
-        return response(['type' => 'success', 'message' => 'Post ' . $action . ' successfully', 'data' => $res], 201);
+        return response(['type' => 'success', 'message' => 'Post ' . $action . ' successfully', 'data' => $res], $action == 'saved' ? 201 : 200);
     }
 
     /**

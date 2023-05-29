@@ -83,7 +83,7 @@ class ProjectsController extends Controller
 
         $res = Project::find($res->_id)->with(['company', 'skills'])->first();
 
-        return response(['type' => 'success', 'message' => 'Project ' . $action . ' successfully', 'data' => $res], 201);
+        return response(['type' => 'success', 'message' => 'Project ' . $action . ' successfully', 'data' => $res], $action == 'saved' ? 201 : 200);
     }
 
     function update()
@@ -92,8 +92,7 @@ class ProjectsController extends Controller
     }
     function show($id)
     {
-
-        $res = Project::find($id)->with(['company', 'skills'])->first();
+        $res = Project::with(['company', 'skills'])->find($id);
         return response(['type' => 'success', 'message' => 'successfully', 'data' => $res], 200);
     }
     /**
