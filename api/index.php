@@ -5,7 +5,7 @@
  * Manually route assets to be found
  * https://github.com/juicyfx/vercel-examples/commit/1fcbe3ff98ae34830cfd779224433cca16bb4f93
  */
-if (isset($_GET['type']) && isset($_GET['file'])) {
+if (isset($_GET['type']) && isset($_GET['file']) && isset($_GET['api_request'])) {
 
     if ($_GET['type'] === 'css') {
         header("Content-type: text/css; charset: UTF-8");
