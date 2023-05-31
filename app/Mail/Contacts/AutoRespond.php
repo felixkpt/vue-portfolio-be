@@ -32,6 +32,9 @@ class AutoRespond extends Mailable
     public function envelope()
     {
         return new Envelope(
+            replyTo: [
+                new Address(config('mail.from.address'), config('app.name')),
+            ],
             subject: 'Message received autoresponse',
         );
     }

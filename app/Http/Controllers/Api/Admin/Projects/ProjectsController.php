@@ -19,20 +19,26 @@ class ProjectsController extends Controller
     use ControllerTrait;
 
     /**
-     * return portfolio's index view
+     * return project's index view
      */
     public function index()
     {
-        if (request()->all == 1)
-            return Project::where('status', 'published')->orWhereNull('status')->get();
+        $items = Project::where([])->with(['company', 'skills']);
 
-        $projects = Project::with(['company', 'skills'])->paginate();
+        if (request()->all)
+            return $this->select($items->limit(4)->get());
 
-        return response(['message' => 'success', 'data' => $projects]);
+        $items = $items->paginate();
+
+        $items_only = $items->getCollection();
+        $res = $this->select($items_only);
+        $items->setCollection($res);
+
+        return response(['message' => 'success', 'data' => $items]);
     }
 
     /**
-     * store portfolio
+     * store project
      */
     public function store($is_update = false)
     {
@@ -81,7 +87,7 @@ class ProjectsController extends Controller
         if (isset($data['skills']))
             $res->skills()->sync($data['skills']);
 
-        $res = Project::find($res->_id)->with(['company', 'skills'])->first();
+        $res = Project::with(['company', 'skills'])->find($res->_id);
 
         return response(['type' => 'success', 'message' => 'Project ' . $action . ' successfully', 'data' => $res], $action == 'saved' ? 201 : 200);
     }
@@ -96,24 +102,46 @@ class ProjectsController extends Controller
         return response(['type' => 'success', 'message' => 'successfully', 'data' => $res], 200);
     }
     /**
-     * toggle portfolio status
+     * toggle project status
      */
-    public function toggleProjectStatus($portfolio_id)
+    public function toggleProjectStatus($project_id)
     {
-        $portfolio = Project::findOrFail($portfolio_id);
-        $state = $portfolio->status == 'published' ? 'Deactivated' : 'Activated';
-        $portfolio->status = $portfolio->status == 'published' ? 'draft' : 'published';
-        $portfolio->save();
-        return redirect()->back()->with('notice', ['type' => 'success', 'message' => 'Project #' . $portfolio->id . ' has been ' . $state]);
+        $project = Project::findOrFail($project_id);
+        $state = $project->status == 'published' ? 'Deactivated' : 'Activated';
+        $project->status = $project->status == 'published' ? 'draft' : 'published';
+        $project->save();
+        return redirect()->back()->with('notice', ['type' => 'success', 'message' => 'Project #' . $project->id . ' has been ' . $state]);
     }
 
     /**
-     * delete portfolio
+     * delete project
      */
-    public function destroyProject($portfolio_id)
+    public function destroyProject($project_id)
     {
-        $portfolio = Project::findOrFail($portfolio_id);
-        $portfolio->delete();
+        $project = Project::findOrFail($project_id);
+        $project->delete();
         return redirect()->back()->with('notice', ['type' => 'success', 'message' => 'Project deleted successfully']);
+    }
+
+    private function select($q)
+    {
+        return $q->map(
+            function ($q) {
+                return [
+                    ...$q->only([
+                        '_id',
+                        'title',
+                        'slug',
+                        'featured_image',
+                        'start_date',
+                        'end_date',
+                        'status',
+                        'importance'
+                    ]),
+                    'company' => $q->company()->first(['name']),
+                    'skills' => $q->skills()->get(['name'])
+                ];
+            }
+        );
     }
 }

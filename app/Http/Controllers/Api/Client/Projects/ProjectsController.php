@@ -20,12 +20,16 @@ class ProjectsController extends Controller
      */
     public function index()
     {
-        $items = Project::wherestatus('published')->with(['company', 'skills']);
+        $items = Project::with(['company', 'skills'])->wherestatus('published')->orderby('importance', 'desc');
 
         if (request()->all)
-            return $items->get();
+            return $this->select($items->limit(4)->get());
 
         $items = $items->paginate();
+
+        $items_only = $items->getCollection();
+        $res = $this->select($items_only);
+        $items->setCollection($res);
 
         return response(['message' => 'success', 'data' => $items]);
     }
@@ -34,5 +38,24 @@ class ProjectsController extends Controller
     {
         $item = Project::with(['company', 'skills'])->wherestatus('published')->whereslug($id)->firstOrFail();
         return response(['type' => 'success', 'message' => 'successfully', 'data' => $item], 200);
+    }
+
+    private function select($q)
+    {
+        return $q->map(
+            function ($q) {
+                return [
+                    ...$q->only([
+                        '_id',
+                        'title',
+                        'slug',
+                        'content_short',
+                        'featured_image',
+                    ]),
+                    'company' => $q->company()->first(['name']),
+                    'skills' => $q->skills()->get(['name'])
+                ];
+            }
+        );
     }
 }

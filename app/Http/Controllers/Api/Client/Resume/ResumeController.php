@@ -21,12 +21,13 @@ class ResumeController extends Controller
 
   private function data()
   {
-    $about = About::wherestatus('published')->first();
-    $companies = Company::wherestatus(1)->limit(5)->get();
-    $contacts = Contact::wherestatus(1)->limit(5)->get();
-    $skills_categories = SkillsCategory::wherestatus(1)->with('skills')->limit(5)->get();;
-    $projects = Project::wherestatus('published')->with(['company', 'skills'])->limit(3)->get();
-    $qualifications = Qualification::wherestatus(1)->limit(5)->get();
+    $about = About::wherestatus('published')->select('salutation', 'name', 'featured_image', 'slogan')->first();
+    $companies = Company::wherestatus(1)->orderby('start_date', 'desc')->limit(5)->get();
+    $contacts = Contact::wherestatus(1)->orderby('importance', 'desc')->limit(3)->get();
+    $skills_categories = SkillsCategory::with('skills')->wherestatus(1)->orderby('importance', 'desc')->limit(3)->get();;
+    $projects = Project::with(['company', 'skills'])->wherestatus('published')->orderby('importance', 'desc')->limit(3)->get();
+    $projects = $this->select($projects);
+    $qualifications = Qualification::wherestatus(1)->orderby('importance', 'desc')->limit(3)->get();
     return [
       'about' => $about,
       'companies' => $companies,
@@ -44,6 +45,26 @@ class ResumeController extends Controller
 
     $pdf = PDF::loadView('resume/pdf_view', [])->setOption([]);
     // download PDF file with download method
-    return $pdf->download($this->data()['about']->name.' resume.pdf');
+    return $pdf->download($this->data()['about']->name . ' resume.pdf');
   }
+
+  private function select($q)
+    {
+        return $q->map(
+            function ($q) {
+                return [
+                    ...$q->only([
+                        '_id',
+                        'title',
+                        'slug',
+                        'content_short',
+                        'featured_image',
+                        'project_url'
+                    ]),
+                    'company' => $q->company()->first(['name']),
+                    'skills' => $q->skills()->get(['name'])
+                ];
+            }
+        );
+    }
 }

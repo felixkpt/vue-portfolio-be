@@ -135,7 +135,7 @@ class AuthController extends Controller
         $name = \request('name');
         $phone = \request('phone');
         $role = 'client';
-        $avatar = 'images/users/default.png';
+        $avatar = null;
 
         $user = User::create([
             'name' => $name,

@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// dd(url('api/api/public'),asset(''),request()->url());
+
 Route::get('/', function(){
     return view('welcome');
 });

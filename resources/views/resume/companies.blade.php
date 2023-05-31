@@ -2,10 +2,10 @@
 <table class="table table-borderless table-sm m-0">
     @foreach ($companies as $company)
         <tr>
-            <td>
+            <td class="pt-0">
                 <table class="table table-borderless table-sm m-0">
                     <tr>
-                        <td><strong><a class="link-unstyled" href="{{ URL::to($company->url) }}">{{ $company->name }}</a></strong>
+                        <td class="pt-0"><strong><a class="link-unstyled" href="{{ URL::to($company->url) }}">{{ $company->name }}</a></strong>
                             <small style="font-weight: bolder;margin:auto;font-size:22px;line-height:0">.</small>
                             <span>{{ $company->position }}</span>
                             <small class="text-black-50">{{ \Carbon\Carbon::parse($company->start_date)->format('M Y') }}
@@ -15,7 +15,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td>
+                        <td class="pt-0">
                             {!! $company->roles !!}
                         </td>
                     </tr>

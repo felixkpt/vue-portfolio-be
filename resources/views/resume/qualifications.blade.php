@@ -2,10 +2,10 @@
 <table class="table table-borderless table-sm m-0">
     @foreach ($qualifications as $qualification)
         <tr>
-            <td>
+            <td class="pt-0">
                 <table class="table table-borderless table-sm m-0">
                     <tr>
-                        <td>
+                        <td class="pt-0">
                             <div><strong>{{ $qualification->course }}</strong></div>
                             <div>{{ $qualification->institution }}</div>
                         </td>

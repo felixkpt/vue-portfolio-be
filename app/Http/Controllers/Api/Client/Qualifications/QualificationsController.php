@@ -20,7 +20,7 @@ class QualificationsController extends Controller
      */
     public function index()
     {
-        $items = Qualification::wherestatus(1)->with('user')->paginate();
+        $items = Qualification::wherestatus(1)->with('user')->orderby('importance', 'desc')->paginate();
         return response(['message' => 'success', 'data' => $items]);
     }
 

@@ -30,7 +30,7 @@
         <table class="table table-borderless table-sm m-0">
             <tbody>
                 <tr>
-                    <td style="width: 70%; padding:0%;">
+                    <td style="width: 70%; padding:0%;vertical-align:top">
                         <div class="table-responsive">
                             <table class="table table-borderless table-sm m-0">
                                 <tr>
