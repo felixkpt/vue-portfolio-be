@@ -23,16 +23,12 @@ class ProjectsController extends Controller
      */
     public function index()
     {
-        $items = Project::where([])->with(['company', 'skills']);
+        $items = Project::where([])->with(['user:name', 'company:name', 'skills']);
 
         if (request()->all)
-            return $this->select($items->limit(4)->get());
+            return $items->limit(4)->get();
 
         $items = $items->paginate();
-
-        $items_only = $items->getCollection();
-        $res = $this->select($items_only);
-        $items->setCollection($res);
 
         return response(['message' => 'success', 'data' => $items]);
     }

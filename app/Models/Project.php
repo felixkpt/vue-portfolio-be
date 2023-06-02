@@ -29,11 +29,11 @@ class Project extends Model
 
     function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->hasOne(User::class, '_id', 'user_id');
     }
     function company()
     {
-        return $this->belongsTo(Company::class);
+        return $this->hasOne(Company::class, '_id', 'company_id');
     }
 
     function skills()

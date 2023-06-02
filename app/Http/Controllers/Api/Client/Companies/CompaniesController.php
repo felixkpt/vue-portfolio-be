@@ -20,7 +20,7 @@ class CompaniesController extends Controller
      */
     public function index()
     {
-        $items = Company::wherestatus(1)->orderby('start_date', 'desc');
+        $items = Company::wherestatus(1)->where('slug', '!=', 'self-projects')->orderby('start_date', 'desc');
 
         if (request()->all)
             return $items->get();

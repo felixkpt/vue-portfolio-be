@@ -20,16 +20,12 @@ class ProjectsController extends Controller
      */
     public function index()
     {
-        $items = Project::with(['company', 'skills'])->wherestatus('published')->orderby('importance', 'desc');
+        $items = Project::with(['user:name', 'company:name', 'skills'])->wherestatus('published')->orderby('importance', 'desc');
 
         if (request()->all)
-            return $this->select($items->limit(4)->get());
+            return $items->limit(4)->get();
 
         $items = $items->paginate();
-
-        $items_only = $items->getCollection();
-        $res = $this->select($items_only);
-        $items->setCollection($res);
 
         return response(['message' => 'success', 'data' => $items]);
     }
