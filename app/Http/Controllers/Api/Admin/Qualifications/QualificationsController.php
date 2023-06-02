@@ -22,7 +22,7 @@ class QualificationsController extends Controller
      */
     public function index()
     {
-        $qualifications = Qualification::with('user')->paginate();
+        $qualifications = Qualification::with('user')->paginate(request()->per_page);
 
         return response(['message' => 'success', 'data' => $qualifications]);
     }

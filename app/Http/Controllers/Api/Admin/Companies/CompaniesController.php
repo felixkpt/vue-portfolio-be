@@ -28,7 +28,7 @@ class CompaniesController extends Controller
         if (request()->all == 1)
             return Company::where('status', 1)->orWhereNull('status')->get();
 
-        $company = Company::with('user')->paginate();
+        $company = Company::with('user')->paginate(request()->per_page);
 
         return response(['message' => 'success', 'data' => $company]);
     }

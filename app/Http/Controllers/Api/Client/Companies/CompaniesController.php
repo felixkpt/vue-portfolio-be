@@ -25,7 +25,7 @@ class CompaniesController extends Controller
         if (request()->all)
             return $items->get();
 
-        $items = $items->paginate();
+        $items = $items->paginate(request()->per_page);
 
         return response(['message' => 'success', 'data' => $items]);
     }

@@ -41,7 +41,7 @@ class AdminController extends Controller
             ->select('contributions.member_id', DB::raw('sum(contributions.amount) as amount'))
             ->orderByRaw('SUM(amount) desc');
         if(!\request('export')) {
-            $topAmounts = $topAmounts->limit(10)->paginate();
+            $topAmounts = $topAmounts->limit(10)->paginate(request()->per_page);
         } else{
             $topAmounts = $topAmounts->get();
         }

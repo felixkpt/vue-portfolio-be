@@ -20,7 +20,7 @@ class SkillsController extends Controller
      */
     public function index()
     {
-        $items = Skill::wherestatus(1)->with(['user', 'skill_category'])->orderby('importance', 'desc')->paginate();
+        $items = Skill::wherestatus(1)->with(['user', 'skill_category'])->orderby('importance', 'desc')->paginate(request()->per_page);
         return response(['message' => 'success', 'data' => $items]);
     }
 

@@ -25,7 +25,7 @@ class AboutController extends Controller
         if (request()->all == 1)
             return About::where('status', 1)->orWhereNull('status')->get();
 
-        $about = About::with('user')->paginate();
+        $about = About::with('user')->paginate(request()->per_page);
 
         return response(['message' => 'success', 'data' => $about]);
     }

@@ -23,7 +23,7 @@ class AboutController extends Controller
         if (request()->all == 1)
             return About::where('status', 'published')->get();
 
-        $company = About::with('user')->paginate();
+        $company = About::with('user')->paginate(request()->per_page);
 
         return response(['message' => 'success', 'data' => $company]);
     }

@@ -26,7 +26,7 @@ class SkillsController extends Controller
         if (request()->all == 1)
         return Skill::where('status', 1)->orWhereNull('status')->get();
 
-        $skills = Skill::with(['user', 'skillCategory'])->paginate();
+        $skills = Skill::with(['user', 'skillCategory'])->paginate(request()->per_page);
 
         return response(['message' => 'success', 'data' => $skills]);
     }

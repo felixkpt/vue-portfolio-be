@@ -21,7 +21,7 @@ class ContactsController extends Controller
      */
     public function index()
     {
-        $contacts = Contact::with('user')->paginate();
+        $contacts = Contact::with('user')->paginate(request()->per_page);
 
         return response(['message' => 'success', 'data' => $contacts]);
     }
