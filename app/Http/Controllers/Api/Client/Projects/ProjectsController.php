@@ -20,12 +20,18 @@ class ProjectsController extends Controller
      */
     public function index()
     {
-        $items = Project::with(['user:name', 'company:name', 'skills'])->wherestatus('published')->orderby('importance', 'desc');
+        $items = Project::wherestatus('published')->with(['company:name', 'skills'])->orderby('importance', 'desc');
 
-        if (request()->all)
-            return $items->limit(4)->get();
+        if (request()->all) {
+            $items = $items->limit(request()->per_page ?? 4)->get();
+            return $this->select($items, 'skills', ['name']);
+        }
 
         $items = $items->paginate(request()->per_page);
+
+        $items_only = $items->getCollection();
+        $res = $this->select($items_only, 'skills', ['name']);
+        $items->setCollection($res);
 
         return response(['message' => 'success', 'data' => $items]);
     }
@@ -36,21 +42,13 @@ class ProjectsController extends Controller
         return response(['type' => 'success', 'message' => 'successfully', 'data' => $item], 200);
     }
 
-    private function select($q)
+    private function select($q, $relation, $columns)
     {
         return $q->map(
-            function ($q) {
-                return [
-                    ...$q->only([
-                        '_id',
-                        'title',
-                        'slug',
-                        'content_short',
-                        'featured_image',
-                    ]),
-                    'company' => $q->company()->first(['name']),
-                    'skills' => $q->skills()->get(['name'])
-                ];
+            function ($q) use ($relation, $columns) {
+                unset($q[$relation]);
+                $q[$relation] = $q->$relation()->get($columns);
+                return $q;
             }
         );
     }
